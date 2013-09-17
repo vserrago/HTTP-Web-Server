@@ -22,6 +22,8 @@ int main(int argc, char *argv [])
     unsigned char portflag, debugflag; //Command line param flags
     int portnumber = DEFAULTPORTNUM; //Port Number, if given one.
     char * portnums = "";
+    char * port = "61000"; //TODO un-hardcode this!
+    char * address = "localhost"; //TODO unhardcode this too!
     struct sockaddr_storage socket_st;
     int status;
     struct addrinfo hints;
@@ -78,7 +80,7 @@ int main(int argc, char *argv [])
     hints.ai_flags = AI_PASSIVE;        //Figure out ip
 
 
-    if ((status = getaddrinfo("localhost", "61000", &hints, &servinfo)) != 0)
+    if ((status = getaddrinfo(address, port, &hints, &servinfo)) != 0)
     {
         printf("getaddrinfo error: %s\n", gai_strerror(status));
         exit(1);
