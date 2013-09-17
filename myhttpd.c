@@ -2,6 +2,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netdb.h>
 #include <arpa/inet.h>
 #include <errno.h>
 #include <sys/errno.h>
@@ -12,13 +13,20 @@
 #include <sys/stat.h>
 
 #define MINPORTNUM 60000
+#define DEFAULTPORTNUM 61000
 
 int main(int argc, char *argv [])
 {
     int i, j;  //Loop Variables
     unsigned char portflag, debugflag; //Command line param flags
-    int portnumber; //Port Number, if given one.
+    int portnumber = DEFAULTPORTNUM; //Port Number, if given one.
+    char * portnums = "";
+    struct sockaddr_storage socket;
+    int status;
+    struct addrinfo hints;
+    struct addrinfo *servinfo;
 
+    /* Arg Parsing */
     for(i=1; i<argc; i++)
     {
         printf("Param: %s\n", argv[i]);
@@ -61,5 +69,21 @@ int main(int argc, char *argv [])
             exit(2);
         }
     }
+
+    /* Socket Sutff */
+    memset(&hints, 0, sizeof hints);    //Wipe space for hints
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;    //Use TCP socket
+    hints.ai_flags = AI_PASSIVE;        //Figure out ip
+
+
+    if ((status = getaddrinfo(NULL, "61000", &hints, &servinfo)) != 0)
+    {
+        printf("getaddrinfo error: %s\n", gai_strerror(status));
+        exit(1);
+    }
+
+
+    freeaddrinfo(servinfo);
     exit(0);
 }
