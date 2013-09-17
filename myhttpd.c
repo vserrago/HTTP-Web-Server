@@ -73,12 +73,12 @@ int main(int argc, char *argv [])
 
     /* Socket Sutff */
     memset(&hints, 0, sizeof hints);    //Wipe space for hints
-    hints.ai_family = AF_UNSPEC;
+    hints.ai_family = AF_UNSPEC;        //Don't specify IP type
     hints.ai_socktype = SOCK_STREAM;    //Use TCP socket
     hints.ai_flags = AI_PASSIVE;        //Figure out ip
 
 
-    if ((status = getaddrinfo(NULL, "61000", &hints, &servinfo)) != 0)
+    if ((status = getaddrinfo("localhost", "61000", &hints, &servinfo)) != 0)
     {
         printf("getaddrinfo error: %s\n", gai_strerror(status));
         exit(1);
@@ -97,6 +97,26 @@ int main(int argc, char *argv [])
         exit(0);
     }
 
+    int backlog = 10;
+
+    if(listen(sock, backlog) != 0)
+    {
+        printf("Listen error\n");
+        exit(0);
+    }
+
+    socklen_t addr_size = sizeof socket_st;
+
+    for(;;) //Forever
+    {
+        int c = accept(sock, (struct sockaddr *) &socket_st, &addr_size);
+
+        if(c < 0)
+        {
+            printf("Accept error\n");
+            exit(0);
+        }
+    }
 
 
     freeaddrinfo(servinfo); //Free address info
