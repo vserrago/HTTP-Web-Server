@@ -1,16 +1,16 @@
-#include <limits.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
 #include <arpa/inet.h>
 #include <errno.h>
-#include <sys/errno.h>
+#include <limits.h>
+#include <netdb.h>
+#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
+#include <sys/errno.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #define MINPORTNUM 60000
 #define DEFAULTPORTNUM 61000
