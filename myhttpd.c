@@ -116,6 +116,31 @@ int main(int argc, char *argv [])
             printf("Accept error\n");
             exit(0);
         }
+
+        for(;;)
+        {
+            char  buff [1000];
+            int bytesrecieved = recv(c,buff, 1000,0);
+
+            if(bytesrecieved < 0)
+            {
+                printf("Recieve Error\n");
+                exit (0);
+            }
+            
+            if(bytesrecieved == 0)
+            {
+                printf("Connection Closed\n");
+                exit(0);
+            }
+
+            printf("%d bytes recieved\n", bytesrecieved);
+
+            printf("Message Recieved: %s", buff);
+            if (send(c, "Hello, world!", 13, 0) == -1)
+                perror("send");
+            exit(0);
+        }
     }
 
 
