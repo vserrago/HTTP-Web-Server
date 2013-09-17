@@ -18,10 +18,11 @@
 int main(int argc, char *argv [])
 {
     int i, j;  //Loop Variables
+    int sock;  //Socket file descriptor
     unsigned char portflag, debugflag; //Command line param flags
     int portnumber = DEFAULTPORTNUM; //Port Number, if given one.
     char * portnums = "";
-    struct sockaddr_storage socket;
+    struct sockaddr_storage socket_st;
     int status;
     struct addrinfo hints;
     struct addrinfo *servinfo;
@@ -83,7 +84,21 @@ int main(int argc, char *argv [])
         exit(1);
     }
 
+    sock = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
+    if(sock == -1)
+    {
+        printf("Socket error\n");
+        exit(0);
+    }
 
-    freeaddrinfo(servinfo);
+    if(bind(sock, servinfo->ai_addr, servinfo->ai_addrlen) != 0)
+    {
+        printf("binderror\n");
+        exit(0);
+    }
+
+
+
+    freeaddrinfo(servinfo); //Free address info
     exit(0);
 }
