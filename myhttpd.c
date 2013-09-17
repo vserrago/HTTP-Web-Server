@@ -20,8 +20,6 @@ int main(int argc, char *argv [])
     int i, j;  //Loop Variables
     int sock;  //Socket file descriptor
     unsigned char portflag, debugflag; //Command line param flags
-    int portnumber = DEFAULTPORTNUM; //Port Number, if given one.
-    char * portnums = "";
     char * port = "61000"; //TODO un-hardcode this!
     char * address = "localhost"; //TODO unhardcode this too!
     struct sockaddr_storage socket_st;
@@ -57,14 +55,15 @@ int main(int argc, char *argv [])
         }
         else if(portflag)
         {
-            portnumber = atoi(argv[i]);
+            port = argv[i];
+            int portnum = atoi(port);
             //Ensure that portnumber is in the range of useable ports
-            if(portnumber < MINPORTNUM || USHRT_MAX < portnumber)
+            if(portnum < MINPORTNUM || USHRT_MAX < portnum)
             {
                 printf("Portnumber is invalid\n");
                 exit(3);
             }
-            printf("Portnum is %d\n", portnumber);
+            printf("Portnum is %s\n", port);
         }
         else
         {
