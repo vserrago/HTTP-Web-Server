@@ -10,6 +10,7 @@ typedef struct
     char* httpver;
     char* rootdir;
     char** extentions;
+    int nextentions;
 } configuration;
 
 //Function prototypes

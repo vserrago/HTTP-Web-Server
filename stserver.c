@@ -23,6 +23,7 @@ configuration* genconf(void)
     c->httpver = NULL;
     c->rootdir = NULL;
     c->extentions = NULL;
+    c->nextentions = 0;
 
     return c;
 }
@@ -70,8 +71,13 @@ configuration* parseconf(char* confname)
     c->rootdir = strncpy(malloc((dirlen-2-1+1)*sizeof(char)),&token[1], dirlen-2-1);
     printf("Home Directory: %s\n", c->rootdir);
 
+    //Get filetypes
     fgets(s,100,f);
     printf("File Line: %s", s);
+
+    //c->extentions = malloc(); TODO finish this
+
+    int len = strlen(s);
 
     if(fclose(f) !=0) //Close file and make sure it closes properly
     {
