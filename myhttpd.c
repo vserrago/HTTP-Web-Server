@@ -42,16 +42,15 @@ configuration* parseconf()
     c->extentions = NULL;
 
     
-    //FILE* f = fopen(confname, "r"); //Open file for reading
-    FILE* f = fopen("myhttpd.conf", "r"); //Open file for reading
-//*
+    FILE* f = fopen(confname, "r"); //Open file for reading
+
     if(f == NULL)
     {
         //printf("fopen error\n");
         perror("fopen");
         exit(0);
     }
-//*
+
     char s [100];
 
     fgets(s,100,f);
@@ -64,7 +63,7 @@ configuration* parseconf()
     {
         printf("File close error\n");
         exit(0);
-    }//*/
+    }
 
     return c;
 }
