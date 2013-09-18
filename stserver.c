@@ -15,6 +15,17 @@
 //Local includes
 #include "stserver.h"
 
+request* genreq(void)
+{
+    request* r = malloc(sizeof(request));
+
+    r->reqtype = NULL;
+    r->reqfile = NULL;
+    r->httpver = NULL;
+
+    return r;
+}
+
 configuration* genconf(void)
 {
     configuration* c = malloc(sizeof(configuration));   //Create struct

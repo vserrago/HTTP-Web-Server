@@ -25,6 +25,13 @@ char* confname = "myhttpd.conf";    //Name of config file
 
 configuration* config;              //Config struct var
 
+//Copies a string into a newly allocated char array
+char* cpynewstr(char* source) 
+{
+    int mlen = strlen(source)+1; 
+    return strcpy(malloc(mlen*sizeof(char)), source); 
+}
+
 int main(int argc, char *argv [])
 {
     int i, j;  //Loop Variables
@@ -150,12 +157,73 @@ int main(int argc, char *argv [])
                 exit(0);
             }
 
-            printf("%d bytes recieved\n", bytesrecieved);
+            printf("%d bytes recieved, Request:\n", bytesrecieved);
+            printf("%s\n",buff);
 
-            printf("Message Recieved: %s", buff);
-            if (send(c, "Hello, world!", 13, 0) == -1)
-                perror("send");
-            exit(0);
+            request* r = genreq();
+            char* token;
+
+            int n;
+
+            //buff = "GET / HTTP/1.1";
+
+            //Retrieve header info
+            /*
+            if((n = sscanf(buff, "%s %s %s", r->reqtype, r->reqfile, r->httpver)) != 3)
+            {
+                printf("scanf error, only %d values scanned in\n");
+                printf("Reqtype: %s, Reqfile: %s, httpver: %s",  r->reqtype, r->reqfile, r->httpver);
+                exit(0);
+            }
+            //*/
+            
+            /*
+            for(i=0;i<3;i++)
+            {
+                char** saveptr;
+                if((token = strtok_r(buff," ",saveptr)) == NULL)
+                {
+                    printf("Buff Token error\n");
+                    exit(0);
+                }
+
+                switch (i)
+                {
+                    case 0: r->reqtype = cpynewstr(token); break;
+                    case 1: r->reqfile = cpynewstr(token); break;
+                    case 2: r->httpver = cpynewstr(token); break;
+                }
+            }
+            */
+            if((token = strtok(buff," ")) == NULL)
+            {
+                printf("Buff Token error\n");
+                exit(0);
+            }
+            r->reqtype = cpynewstr(token); 
+
+            if((token = strtok(NULL," ")) == NULL)
+            {
+                printf("Buff Token error\n");
+                exit(0);
+            }
+            r->reqfile = cpynewstr(token); 
+
+            if((token = strtok(NULL," ")) == NULL)
+            {
+                printf("Buff Token error\n");
+                exit(0);
+            }
+            r->httpver = cpynewstr(token); 
+
+            printf("Reqtype: %s, Reqfile: %s, httpver: %s\n",  r->reqtype, r->reqfile, r->httpver);
+
+
+            /*
+               printf("Message Recieved: %s", buff);
+               if (send(c, "Hello, world!", 13, 0) == -1)
+               perror("send");
+               exit(0);//*/
         }
     }
 
