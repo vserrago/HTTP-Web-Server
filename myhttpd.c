@@ -19,15 +19,15 @@ char* confname = "myhttpd.conf";
 
 //Global Vars
 int sock;  //Socket file descriptor
-char * port = "61000"; //TODO un-hardcode this!
-char * address = "localhost"; //TODO unhardcode this too!
+char* port = "61000"; //TODO un-hardcode this!
+char* address = "localhost"; //TODO unhardcode this too!
 char debugflag;
 
 typedef struct
 {
     int httpver;
-    char * rootdir;
-    char ** extentions;
+    char* rootdir;
+    char** extentions;
 } configuration;
 
 configuration* config; //Config struct var
@@ -46,7 +46,6 @@ configuration* parseconf()
 
     if(f == NULL)
     {
-        //printf("fopen error\n");
         perror("fopen");
         exit(0);
     }
@@ -61,7 +60,7 @@ configuration* parseconf()
 
     if(fclose(f) !=0) //Close file and make sure it closes properly
     {
-        printf("File close error\n");
+        perror("fclose");
         exit(0);
     }
 
@@ -75,7 +74,7 @@ int main(int argc, char *argv [])
     struct sockaddr_storage socket_st;
     int status;
     struct addrinfo hints;
-    struct addrinfo *servinfo;
+    struct addrinfo* servinfo;
 
     /* Arg Parsing */
     for(i=1; i<argc; i++)
@@ -98,7 +97,7 @@ int main(int argc, char *argv [])
                         break;
                     default:
                         printf("Unkown param given\n");
-                        exit(1);
+                        exit(0);
                         break;
                 }
             }
@@ -111,18 +110,18 @@ int main(int argc, char *argv [])
             if(portnum < MINPORTNUM || USHRT_MAX < portnum)
             {
                 printf("Portnumber is invalid\n");
-                exit(3);
+                exit(0);
             }
             printf("Portnum is %s\n", port);
         }
         else
         {
             printf("Unkown arg given\n");
-            exit(2);
+            exit(0);
         }
     }
 
-    config = parseconf();
+    config = parseconf();   //Parse configuration file and get info from it.
 
 
     /* Socket Sutff */
@@ -132,12 +131,14 @@ int main(int argc, char *argv [])
     hints.ai_flags = AI_PASSIVE;        //Figure out ip
 
 
+    //Get address info
     if ((status = getaddrinfo(address, port, &hints, &servinfo)) != 0)
     {
         printf("getaddrinfo error: %s\n", gai_strerror(status));
-        exit(1);
+        exit(0);
     }
 
+    //Create socket
     sock = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
     if(sock == -1)
     {
@@ -145,14 +146,16 @@ int main(int argc, char *argv [])
         exit(0);
     }
 
+    //Bind socket
     if(bind(sock, servinfo->ai_addr, servinfo->ai_addrlen) != 0)
     {
         printf("binderror\n");
         exit(0);
     }
 
-    int backlog = 10;
+    int backlog = 10; //Have a backlog of up to 10 requests
 
+    //Listen on socket for incoming connections
     if(listen(sock, backlog) != 0)
     {
         printf("Listen error\n");
