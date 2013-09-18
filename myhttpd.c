@@ -11,26 +11,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-
-#define MINPORTNUM 60000
-#define DEFAULTPORTNUM 61000
-
-char* confname = "myhttpd.conf";
-
-//Global Vars
-int sock;  //Socket file descriptor
-char* port = "61000"; //TODO un-hardcode this!
-char* address = "localhost"; //TODO unhardcode this too!
-char debugflag;
-
-typedef struct
-{
-    char* httpver;
-    char* rootdir;
-    char** extentions;
-} configuration;
-
-configuration* config; //Config struct var
+#include "stserver.h"
 
 configuration* parseconf()
 {
