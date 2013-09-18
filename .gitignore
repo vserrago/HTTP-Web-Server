@@ -19,3 +19,6 @@
 
 #Vim files
 *.swp
+
+#Named executables
+server
