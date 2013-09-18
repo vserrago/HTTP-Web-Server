@@ -1,3 +1,5 @@
+#include <stdarg.h>
+
 //Constants
 #define MINPORTNUM 60000
 #define DEFAULTPORTNUM 61000

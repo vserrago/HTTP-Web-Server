@@ -57,6 +57,19 @@ configuration* parseconf(char* confname)
         exit(0);
     }
 
+    //Set home directory
+    token = strtok(NULL," "); 
+    printf("Token: %s\n",token);
+
+    int dirlen = strlen(token);
+
+    printf("Dirlen Token size: %d\n", dirlen);
+
+    //Copy the dir name to a new char array of size n -2(brackets) -1(newline) 
+    //+ 1 (null terminator). Copy dirlen -2(brackets) -1(newline).
+    c->rootdir = strncpy(malloc((dirlen-2-1+1)*sizeof(char)),&token[1], dirlen-2-1);
+    printf("Home Directory: %s\n", c->rootdir);
+
     fgets(s,100,f);
     printf("File Line: %s", s);
 
