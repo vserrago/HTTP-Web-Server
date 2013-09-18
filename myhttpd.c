@@ -25,7 +25,7 @@ char debugflag;
 
 typedef struct
 {
-    int httpver;
+    char* httpver;
     char* rootdir;
     char** extentions;
 } configuration;
@@ -37,7 +37,7 @@ configuration* parseconf()
     configuration* c = malloc(sizeof(configuration));   //Create struct
     
     //Set each value to a defualt value
-    c->httpver = 0;
+    c->httpver = NULL;
     c->rootdir = NULL;
     c->extentions = NULL;
 
@@ -51,9 +51,22 @@ configuration* parseconf()
     }
 
     char s [100];
+    char* token;
 
     fgets(s,100,f);
     printf("DirPath Line: %s", s);
+
+    token = strtok(s," "); //Note, strtok is not threadsafe implementation
+    printf("Token: %s\n",token);
+
+    //Determine http version
+    if(strcmp("HTTP1.0",token) == 0)
+        c->httpver = "1.0";
+    else
+    {
+        printf("httpver error\n");
+        exit(0);
+    }
 
     fgets(s,100,f);
     printf("File Line: %s", s);
