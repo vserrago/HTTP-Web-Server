@@ -15,13 +15,61 @@
 #define MINPORTNUM 60000
 #define DEFAULTPORTNUM 61000
 
+char* confname = "myhttpd.conf";
+
+//Global Vars
+int sock;  //Socket file descriptor
+char * port = "61000"; //TODO un-hardcode this!
+char * address = "localhost"; //TODO unhardcode this too!
+char debugflag;
+
+typedef struct
+{
+    int httpver;
+    char * rootdir;
+    char ** extentions;
+} configuration;
+
+configuration* config; //Config struct var
+
+configuration* parseconf()
+{
+    configuration* c = malloc(sizeof(configuration));   //Create struct
+    
+    //Set each value to a defualt value
+    c->httpver = 0;
+    c->rootdir = NULL;
+    c->extentions = NULL;
+
+    
+    //FILE* f = fopen(confname, "r"); //Open file for reading
+    FILE* f = fopen("myhttpd.conf", "r"); //Open file for reading
+//*
+    if(f == NULL)
+    {
+        //printf("fopen error\n");
+        perror("fopen");
+        exit(0);
+    }
+//*
+    char s [100];
+    fgets(s,100,f);
+    
+    printf("File Line: %s", s);
+
+    if(fclose(f) !=0) //Close file and make sure it closes properly
+    {
+        printf("File close error\n");
+        exit(0);
+    }//*/
+
+    return c;
+}
+
 int main(int argc, char *argv [])
 {
     int i, j;  //Loop Variables
-    int sock;  //Socket file descriptor
-    unsigned char portflag, debugflag; //Command line param flags
-    char * port = "61000"; //TODO un-hardcode this!
-    char * address = "localhost"; //TODO unhardcode this too!
+    unsigned char portflag; //Command line param flags
     struct sockaddr_storage socket_st;
     int status;
     struct addrinfo hints;
@@ -72,6 +120,9 @@ int main(int argc, char *argv [])
         }
     }
 
+    config = parseconf();
+
+
     /* Socket Sutff */
     memset(&hints, 0, sizeof hints);    //Wipe space for hints
     hints.ai_family = AF_UNSPEC;        //Don't specify IP type
@@ -108,6 +159,7 @@ int main(int argc, char *argv [])
 
     socklen_t addr_size = sizeof socket_st;
 
+    printf("Ready to recieve\n");
     for(;;) //Forever
     {
         int c = accept(sock, (struct sockaddr *) &socket_st, &addr_size);
@@ -128,7 +180,7 @@ int main(int argc, char *argv [])
                 printf("Recieve Error\n");
                 exit (0);
             }
-            
+
             if(bytesrecieved == 0)
             {
                 printf("Connection Closed\n");
