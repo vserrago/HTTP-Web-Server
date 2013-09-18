@@ -1,3 +1,4 @@
+#CC=clang
 CC=gcc
 OBJ=myhttpd.o stserver.o
 BINARY=server
