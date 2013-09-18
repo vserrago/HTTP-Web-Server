@@ -53,8 +53,11 @@ configuration* parseconf()
     }
 //*
     char s [100];
+
     fgets(s,100,f);
-    
+    printf("DirPath Line: %s", s);
+
+    fgets(s,100,f);
     printf("File Line: %s", s);
 
     if(fclose(f) !=0) //Close file and make sure it closes properly
