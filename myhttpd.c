@@ -165,36 +165,7 @@ int main(int argc, char *argv [])
 
             int n;
 
-            //buff = "GET / HTTP/1.1";
-
-            //Retrieve header info
-            /*
-            if((n = sscanf(buff, "%s %s %s", r->reqtype, r->reqfile, r->httpver)) != 3)
-            {
-                printf("scanf error, only %d values scanned in\n");
-                printf("Reqtype: %s, Reqfile: %s, httpver: %s",  r->reqtype, r->reqfile, r->httpver);
-                exit(0);
-            }
-            //*/
-            
-            /*
-            for(i=0;i<3;i++)
-            {
-                char** saveptr;
-                if((token = strtok_r(buff," ",saveptr)) == NULL)
-                {
-                    printf("Buff Token error\n");
-                    exit(0);
-                }
-
-                switch (i)
-                {
-                    case 0: r->reqtype = cpynewstr(token); break;
-                    case 1: r->reqfile = cpynewstr(token); break;
-                    case 2: r->httpver = cpynewstr(token); break;
-                }
-            }
-            */
+            //Parse header request
             if((token = strtok(buff," ")) == NULL)
             {
                 printf("Buff Token error\n");
@@ -218,6 +189,22 @@ int main(int argc, char *argv [])
 
             printf("Reqtype: %s, Reqfile: %s, httpver: %s\n",  r->reqtype, r->reqfile, r->httpver);
 
+
+            //Look for header ending 
+            for(i=1;i<1000;i++)
+            {
+                if(buff[i] == '\r' && buff[i-1] == '\n')
+                {
+                    printf("CLRF WAS found\n");
+                    break;
+                }
+            }
+            //Check to see if loop parsed through entire buffer
+            if(i == 1000-1)
+            {
+                printf("CLRF not found\n");
+                exit(0);
+            }
 
             /*
                printf("Message Recieved: %s", buff);
