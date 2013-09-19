@@ -222,6 +222,21 @@ int main(int argc, char *argv [])
             strcat(abspath, r->reqfile);
 
             printf("Abspath: '%s'\n", abspath);
+
+            FILE* f = fopen(abspath, "r"); //Open file for reading
+            if(f == NULL)
+            {
+                perror("fopen");
+                exit(0);
+            }
+
+            response* resp = genresp();
+
+            for(n=0; getc(f)!=EOF; n++);
+            resp->contlen = n;
+            rewind(f);
+
+            printf("Content Length: %d\n", resp->contlen);
         }
     }
 

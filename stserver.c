@@ -26,6 +26,16 @@ request* genreq(void)
     return r;
 }
 
+response* genresp(void)
+{
+    response* r = malloc(sizeof(response));
+
+    r->status =NULL;
+    r->date =NULL;
+    r->contype =NULL;
+    r->contlen =0;
+}
+
 configuration* genconf(void)
 {
     configuration* c = malloc(sizeof(configuration));   //Create struct
