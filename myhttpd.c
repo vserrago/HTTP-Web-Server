@@ -180,14 +180,14 @@ int main(int argc, char *argv [])
             }
             r->reqfile = cpynewstr(token); 
 
-            if((token = strtok(NULL," ")) == NULL)
+            if((token = strtok(NULL," \r\n")) == NULL)
             {
                 printf("Buff Token error\n");
                 exit(0);
             }
             r->httpver = cpynewstr(token); 
 
-            printf("Reqtype: %s, Reqfile: %s, httpver: %s\n",  r->reqtype, r->reqfile, r->httpver);
+            printf("Reqtype: '%s', Reqfile: '%s', httpver: '%s'\n",  r->reqtype, r->reqfile, r->httpver);
 
 
             //Look for header ending 
@@ -211,6 +211,17 @@ int main(int argc, char *argv [])
                if (send(c, "Hello, world!", 13, 0) == -1)
                perror("send");
                exit(0);//*/
+
+            //n = (strlen(config->rootdir) + strlen(r->reqfile) + 1)
+            n = strlen(config->rootdir);
+            n += strlen(r->reqfile) + 2;
+            //Combine paths
+            char* abspath = malloc(
+                    n*sizeof(char));
+            strcpy(abspath, config->rootdir);
+            strcat(abspath, r->reqfile);
+
+            printf("Abspath: '%s'\n", abspath);
         }
     }
 

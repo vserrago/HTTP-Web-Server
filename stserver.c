@@ -70,16 +70,17 @@ configuration* parseconf(char* confname)
     }
 
     //Set home directory
-    token = strtok(NULL," "); 
-    printf("Token: %s\n",token);
+    token = strtok(NULL," \r\n"); 
+    printf("Token: '%s'\n",token);
 
     int dirlen = strlen(token);
 
     printf("Dirlen Token size: %d\n", dirlen);
 
     //Copy the dir name to a new char array of size n -2(brackets) -1(newline) 
-    //+ 1 (null terminator). Copy dirlen -2(brackets) -1(newline).
-    c->rootdir = strncpy(malloc((dirlen-2-1+1)*sizeof(char)),&token[1], dirlen-2-1);
+    //+ 1 (null terminator). Copy dirlen -1(end bracket) -1(newline).
+    //c->rootdir = strcpy(malloc((dirlen)*sizeof(char)),&token[1]);
+    c->rootdir = strncpy(malloc((dirlen-2+1)*sizeof(char)),&token[1], dirlen-2);
     printf("Home Directory: %s\n", c->rootdir);
 
     //Get filetypes
