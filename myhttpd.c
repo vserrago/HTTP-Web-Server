@@ -231,16 +231,86 @@ int main(int argc, char *argv [])
             }
 
             response* resp = genresp();
+            resp->status = cpynewstr("HTTP/1.0 200 OK\r\n");
+            resp->date = cpynewstr("Date: Fri, 31 Dec 1999 23:59:59 GMT\r\n");
+            resp->contype= cpynewstr("Content-Type: text/html\r\n");
+            resp->contlenstr= malloc(50*sizeof(char));
 
             for(n=0; getc(f)!=EOF; n++);
             resp->contlen = n;
-            rewind(f);
+           // rewind(f);
+            if(fseek(f, 0L, SEEK_SET) == -1)
+            {
+                perror("fseek");
+                exit(0);
+            }
+
+            sprintf(resp->contlenstr, "Content-Length %d", resp->contlen);
 
             printf("Content Length: %d\n", resp->contlen);
+            printf("Content Length String: %s\n", resp->contlenstr);
+
+            //Get length of response total
+            n = strlen(resp->status) + strlen(resp->date) + strlen(resp->contype) + strlen(resp->contlenstr) + 10 + resp->contlen;
+
+            //Make response buffer
+            char* respbuff = malloc(n*sizeof(char));
+            int buffsize = n;
+            
+            strcpy(respbuff, resp->status);
+            strcat(respbuff, resp->date);
+            strcat(respbuff, resp->contype);
+            strcat(respbuff, resp->contlenstr);
+            strcat(respbuff, "\r\n");
+            strcat(respbuff, "\r\n");
+
+
+            n = strrchr(respbuff, '\0') - respbuff;
+
+            printf("Header: '%s'\n", respbuff);
+            printf("Last Occurrance of null char: %d\n", n);
+
+            //Copy file into buffer
+            for(i=n;(respbuff[i] = getc(f))!=EOF; i++);
+
+
+            printf("Buffer: '%s\n'", respbuff);
+
+            //for(n=0;(n += send(c,(&respbuff + n*sizeof(char) ),buffsize-n,0)) > 0;)
+            int a = 0;
+           // for(n=0;(n += send(c, respbuff+a*sizeof(char) ,100,0)) > 0;a+=100) // good one
+        for(n=0;(n += send(c, respbuff+a*sizeof(char) ,buffsize,0)) != 0;a+=n)
+            ; // good one
+          // while((n = send(c,respbuff,buffsize,0)) !=0)
+            //for(n=0;(n = send(c, respbuff+a*sizeof(char) ,buffsize-a,0)) > 0; a+=n)
+            //for(i=0; i< buffsize; i+=100)
+           /* {
+                n = send(c,respbuff,100,0);
+                if(n == 0)
+                {
+                    printf("send error 0 bytes\n");
+                    exit(0);
+                }
+                if(n == -1)
+                {
+                    printf("send error\n");
+                    exit(0);
+                }
+
+                printf("Bytes sent: %d\n", n);
+                printf("Sending info...\n");
+            }*/
+
+            printf("Bytes sent: %d", n);
+
+            break;
         }
+        close(c);
+        break;
     }
 
-
+    //Finish Up
+    close(sock);
     freeaddrinfo(servinfo); //Free address info
     exit(0);
 }

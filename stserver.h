@@ -25,6 +25,7 @@ typedef struct
     char* status;   //Status line, ex HTTP/1.0 200 OK
     char* date;
     char* contype;  //Content-Type
+    char* contlenstr;  //Content-length string
     int  contlen;  //Content-length
 }response;
 

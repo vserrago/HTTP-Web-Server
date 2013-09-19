@@ -33,7 +33,10 @@ response* genresp(void)
     r->status =NULL;
     r->date =NULL;
     r->contype =NULL;
+    r->contlenstr = NULL;
     r->contlen =0;
+
+    return r;
 }
 
 configuration* genconf(void)
