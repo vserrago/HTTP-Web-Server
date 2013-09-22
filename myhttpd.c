@@ -140,6 +140,10 @@ int main(int argc, char *argv [])
             if(bytesrecieved < 0)
             {
                 exiterr("Recieve Error\n");
+<<<<<<< HEAD
+=======
+                exit (0);
+>>>>>>> 6341a08d04c408d3780e4c067f6873ca3b178fd4
             }
 
             if(bytesrecieved == 0)
