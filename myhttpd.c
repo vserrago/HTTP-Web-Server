@@ -61,8 +61,7 @@ int main(int argc, char *argv [])
                         debugflag = 1;
                         break;
                     default:
-                        printf("Unkown param given\n");
-                        exit(0);
+                        exiterr("Unkown param given\n");
                         break;
                 }
             }
@@ -74,15 +73,13 @@ int main(int argc, char *argv [])
             //Ensure that portnumber is in the range of useable ports
             if(portnum < MINPORTNUM || USHRT_MAX < portnum)
             {
-                printf("Portnumber is invalid\n");
-                exit(0);
+                exiterr("Portnumber is invalid\n");
             }
             servdeblog("Portnum is %s\n", port);
         }
         else
         {
-            printf("Unkown arg given\n");
-            exit(0);
+            exiterr("Unkown arg given\n");
         }
     }
 
@@ -99,23 +96,20 @@ int main(int argc, char *argv [])
     //Get address info
     if ((status = getaddrinfo(address, port, &hints, &servinfo)) != 0)
     {
-        printf("getaddrinfo error: %s\n", gai_strerror(status));
-        exit(0);
+        exiterr("getaddrinfo error: %s\n", gai_strerror(status));
     }
 
     //Create socket
     sock = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
     if(sock == -1)
     {
-        printf("Socket error\n");
-        exit(0);
+        exiterr("Socket error\n");
     }
 
     //Bind socket
     if(bind(sock, servinfo->ai_addr, servinfo->ai_addrlen) != 0)
     {
-        printf("binderror\n");
-        exit(0);
+        exiterr("binderror\n");
     }
 
     int backlog = 10; //Have a backlog of up to 10 requests
@@ -123,21 +117,19 @@ int main(int argc, char *argv [])
     //Listen on socket for incoming connections
     if(listen(sock, backlog) != 0)
     {
-        printf("Listen error\n");
-        exit(0);
+        exiterr("Listen error\n");
     }
 
     socklen_t addr_size = sizeof socket_st;
 
-    printf("Ready to recieve\n");
+    servlog("Ready to recieve\n");
     for(;;) //Forever
     {
         int c = accept(sock, (struct sockaddr *) &socket_st, &addr_size);
 
         if(c < 0)
         {
-            printf("Accept error\n");
-            exit(0);
+            exiterr("Accept error\n");
         }
 
         for(;;)
@@ -147,14 +139,12 @@ int main(int argc, char *argv [])
 
             if(bytesrecieved < 0)
             {
-                printf("Recieve Error\n");
-                exit (0);
+                exiterr("Recieve Error\n");
             }
 
             if(bytesrecieved == 0)
             {
-                printf("Connection Closed\n");
-                exit(0);
+                exiterr("Connection Closed\n");
             }
 
             servdeblog("%d bytes recieved, Request:\n", bytesrecieved);
@@ -168,22 +158,19 @@ int main(int argc, char *argv [])
             //Parse header request
             if((token = strtok(buff," ")) == NULL)
             {
-                printf("Buff Token error\n");
-                exit(0);
+                exiterr("Buff Token error\n");
             }
             r->reqtype = cpynewstr(token); 
 
             if((token = strtok(NULL," ")) == NULL)
             {
-                printf("Buff Token error\n");
-                exit(0);
+                exiterr("Buff Token error\n");
             }
             r->reqfile = cpynewstr(token); 
 
             if((token = strtok(NULL," \r\n")) == NULL)
             {
-                printf("Buff Token error\n");
-                exit(0);
+                exiterr("Buff Token error\n");
             }
             r->httpver = cpynewstr(token); 
 
@@ -202,15 +189,14 @@ int main(int argc, char *argv [])
             //Check to see if loop parsed through entire buffer
             if(i == 1000-1)
             {
-                printf("CLRF not found\n");
-                exit(0);
+                exiterr("CLRF not found\n");
             }
 
             /*
                servdeblog("Message Recieved: %s", buff);
                if (send(c, "Hello, world!", 13, 0) == -1)
-               perror("send");
-               exit(0);//*/
+               exitperr("send");
+               //*/
 
             //n = (strlen(config->rootdir) + strlen(r->reqfile) + 1)
             n = strlen(config->rootdir);
@@ -226,8 +212,7 @@ int main(int argc, char *argv [])
             FILE* f = fopen(abspath, "r"); //Open file for reading
             if(f == NULL)
             {
-                perror("fopen");
-                exit(0);
+                exitperr("fopen");
             }
 
             response* resp = allocresp();
@@ -241,8 +226,7 @@ int main(int argc, char *argv [])
            // rewind(f);
             if(fseek(f, 0L, SEEK_SET) == -1)
             {
-                perror("fseek");
-                exit(0);
+                exitperr("fseek");
             }
 
             sprintf(resp->contlenstr, "Content-Length %d", resp->contlen);
@@ -288,20 +272,18 @@ int main(int argc, char *argv [])
                 n = send(c,respbuff,100,0);
                 if(n == 0)
                 {
-                    printf("send error 0 bytes\n");
-                    exit(0);
+                    exiterr("send error 0 bytes\n");
                 }
                 if(n == -1)
                 {
-                    printf("send error\n");
-                    exit(0);
+                    exiterr("send error\n");
                 }
 
-                printf("Bytes sent: %d\n", n);
-                printf("Sending info...\n");
+                servlog("Bytes sent: %d\n", n);
+                servlog("Sending info...\n");
             }*/
 
-            printf("Bytes sent: %d", n);
+            servlog("Bytes sent: %d\n", n);
 
             break;
         }
