@@ -5,7 +5,16 @@
 #define DEFAULTPORTNUM 61000
 
 //Struct definitions
-typedef struct
+typedef struct //stserver
+{
+    int   sock;                 //Socket file descriptor
+    char* port;                 //Port to listen on
+    char* address;              //Ip address of the server
+    char* confname;             //Name of config file
+    unsigned char debugflag;    //Whether debug logging is enabled or not
+}stserver;
+
+typedef struct //configuration
 {
     char* httpver;
     char* rootdir;
@@ -13,14 +22,14 @@ typedef struct
     int nextentions;
 } configuration;
 
-typedef struct
+typedef struct //request
 {
     char* reqtype;  //Requested type, Ex GET
     char* reqfile;  //Requested file
     char* httpver;  //HTTP version
 }request;
 
-typedef struct
+typedef struct response
 {
     char* status;   //Status line, ex HTTP/1.0 200 OK
     char* date;
@@ -30,11 +39,20 @@ typedef struct
 }response;
 
 
-//Function prototypes
+//Struct Allocation and Free functions
+stserver* allocstserv(void);
+void freestserv(stserver* s);
+
 request* genreq(void);
+void freereq(request* r);
+
 response* genresp(void);
+void freeresp(response* r);
 
 configuration* genconf(void);
+void freeconf(configuration* c);
+
+//Server functions
 configuration* parseconf(char * confname);
 void exiterr(const char* format, ...);
 void exitperr(const char* format, ...);
