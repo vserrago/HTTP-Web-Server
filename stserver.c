@@ -119,8 +119,7 @@ configuration* parseconf(char* confname)
 
     if(f == NULL)
     {
-        perror("fopen");
-        exit(0);
+        exitperr("fopen");
     }
 
     char s [100];
@@ -137,8 +136,7 @@ configuration* parseconf(char* confname)
         c->httpver = "1.0";
     else
     {
-        printf("httpver error\n");
-        exit(0);
+        exiterr("httpver error\n");
     }
 
     //Set home directory
@@ -165,8 +163,7 @@ configuration* parseconf(char* confname)
 
     if(fclose(f) !=0) //Close file and make sure it closes properly
     {
-        perror("fclose");
-        exit(0);
+        exitperr("fclose");
     }
 
     return c;
@@ -183,9 +180,18 @@ void exiterr(const char* format, ...)
 
 void exitperr(const char* format, ...)
 {
+    //TODO print out additional args
     //Print error and exit
     perror(format);
     exit(errno);
+}
+
+void servlog(const char* format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    vfprintf(stdout, format, args);
+    va_end(args);
 }
 
 void servdeblog(const char* format, ...)
