@@ -43,13 +43,13 @@ typedef struct response
 stserver* allocstserv(void);
 void freestserv(stserver* s);
 
-request* genreq(void);
+request* allocreq(void);
 void freereq(request* r);
 
-response* genresp(void);
+response* allocresp(void);
 void freeresp(response* r);
 
-configuration* genconf(void);
+configuration* allocconf(void);
 void freeconf(configuration* c);
 
 //Server functions

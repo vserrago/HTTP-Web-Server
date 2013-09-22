@@ -160,7 +160,7 @@ int main(int argc, char *argv [])
             printf("%d bytes recieved, Request:\n", bytesrecieved);
             printf("%s\n",buff);
 
-            request* r = genreq();
+            request* r = allocreq();
             char* token;
 
             int n;
@@ -230,7 +230,7 @@ int main(int argc, char *argv [])
                 exit(0);
             }
 
-            response* resp = genresp();
+            response* resp = allocresp();
             resp->status = cpynewstr("HTTP/1.0 200 OK\r\n");
             resp->date = cpynewstr("Date: Fri, 31 Dec 1999 23:59:59 GMT\r\n");
             resp->contype= cpynewstr("Content-Type: text/html\r\n");

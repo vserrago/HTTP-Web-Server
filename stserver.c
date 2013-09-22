@@ -41,7 +41,7 @@ void freestserv(stserver* s)
 }
 
 
-request* genreq(void)
+request* allocreq(void)
 {
     request* r = malloc(sizeof(request));
 
@@ -62,7 +62,7 @@ void freereq(request* r)
     free(r);
 }
 
-response* genresp(void)
+response* allocresp(void)
 {
     response* r = malloc(sizeof(response));
 
@@ -86,7 +86,7 @@ void freeresp(response* r)
     free(r);
 }
 
-configuration* genconf(void)
+configuration* allocconf(void)
 {
     configuration* c = malloc(sizeof(configuration));   //Create struct
     
@@ -111,7 +111,7 @@ void freeconf(configuration* c)
 
 configuration* parseconf(char* confname)
 {
-    configuration* c = genconf();
+    configuration* c = allocconf();
     
     FILE* f = fopen(confname, "r"); //Open file for reading
 
