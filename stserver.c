@@ -169,3 +169,29 @@ configuration* parseconf(char* confname)
 
     return c;
 }
+
+void exiterr(const char* format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end(args);
+    exit(0);
+}
+
+void exitperr(const char* format, ...)
+{
+    //Print error and exit
+    perror(format);
+    exit(errno);
+}
+
+void servdeblog(stserver* s, const char* format, ...)
+{
+    if(!s->debugflag) return; //Return if we don't want to display debug info
+
+    va_list args;
+    va_start(args, format);
+    vfprintf(stdout, format, args);
+    va_end(args);
+}

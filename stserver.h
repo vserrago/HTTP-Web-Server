@@ -54,7 +54,7 @@ void freeconf(configuration* c);
 
 //Server functions
 configuration* parseconf(char * confname);
-void exiterr(const char* format, ...);
-void exitperr(const char* format, ...);
-void servlog(const char* format, ...);
-void servdeblog(const char* format, ...);
+void exiterr(const char* format, ...);  //Exit with a given error message
+void exitperr(const char* format, ...); //Call perror and then exit
+void servlog(const char* format, ...);  //Log status of server
+void servdeblog(stserver* s, const char* format, ...); //Log debug info
