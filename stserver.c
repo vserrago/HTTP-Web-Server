@@ -15,6 +15,9 @@
 //Local includes
 #include "stserver.h"
 
+//Global var values
+unsigned char debugflag = 0; //False by default
+
 //Allocation and Free functions
 stserver* allocstserv(void)
 {
@@ -25,7 +28,6 @@ stserver* allocstserv(void)
     s->port = NULL;
     s->address = NULL;
     s->confname = NULL;
-    s->debugflag = 0; //Don't debug by default
 
     return s;
 }
@@ -125,10 +127,10 @@ configuration* parseconf(char* confname)
     char* token;
 
     fgets(s,100,f);
-    printf("DirPath Line: %s", s);
+    servdeblog("DirPath Line: %s", s);
 
     token = strtok(s," "); //Note, strtok is not threadsafe implementation
-    printf("Token: %s\n",token);
+    servdeblog("Token: %s\n",token);
 
     //Determine http version
     if(strcmp("HTTP1.0",token) == 0)
@@ -141,21 +143,21 @@ configuration* parseconf(char* confname)
 
     //Set home directory
     token = strtok(NULL," \r\n"); 
-    printf("Token: '%s'\n",token);
+    servdeblog("Token: '%s'\n",token);
 
     int dirlen = strlen(token);
 
-    printf("Dirlen Token size: %d\n", dirlen);
+    servdeblog("Dirlen Token size: %d\n", dirlen);
 
     //Copy the dir name to a new char array of size n -2(brackets) -1(newline) 
     //+ 1 (null terminator). Copy dirlen -1(end bracket) -1(newline).
     //c->rootdir = strcpy(malloc((dirlen)*sizeof(char)),&token[1]);
     c->rootdir = strncpy(malloc((dirlen-2+1)*sizeof(char)),&token[1], dirlen-2);
-    printf("Home Directory: %s\n", c->rootdir);
+    servdeblog("Home Directory: %s\n", c->rootdir);
 
     //Get filetypes
     fgets(s,100,f);
-    printf("File Line: %s", s);
+    servdeblog("File Line: %s", s);
 
     //c->extentions = malloc(); TODO finish this
 
@@ -186,9 +188,9 @@ void exitperr(const char* format, ...)
     exit(errno);
 }
 
-void servdeblog(stserver* s, const char* format, ...)
+void servdeblog(const char* format, ...)
 {
-    if(!s->debugflag) return; //Return if we don't want to display debug info
+    if(!debugflag) return; //Return if we don't want to display debug info
 
     va_list args;
     va_start(args, format);

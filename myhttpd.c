@@ -20,7 +20,7 @@
 int sock;                           //Socket file descriptor
 char* port = "61000";               //TODO un-hardcode this!
 char* address = "localhost";        //TODO unhardcode this too!
-unsigned char debugflag =0;         //Whether debug logging is enabled or not
+//unsigned char debugflag =0;         //Whether debug logging is enabled or not
 char* confname = "myhttpd.conf";    //Name of config file
 
 configuration* config;              //Config struct var
@@ -44,7 +44,7 @@ int main(int argc, char *argv [])
     /* Arg Parsing */
     for(i=1; i<argc; i++)
     {
-        printf("Param: %s\n", argv[i]);
+        servdeblog("Param: %s\n", argv[i]);
         if(argv[i][0] == '-')
         {
             int len = strlen(argv[i]);
@@ -53,11 +53,11 @@ int main(int argc, char *argv [])
                 switch(argv[i][j])
                 {
                     case 'p': 
-                        printf("p param given\n");
+                        servdeblog("p param given\n");
                         portflag = 1;
                         break;
                     case 'd':
-                        printf("d param given\n");
+                        servdeblog("d param given\n");
                         debugflag = 1;
                         break;
                     default:
@@ -77,7 +77,7 @@ int main(int argc, char *argv [])
                 printf("Portnumber is invalid\n");
                 exit(0);
             }
-            printf("Portnum is %s\n", port);
+            servdeblog("Portnum is %s\n", port);
         }
         else
         {
@@ -157,8 +157,8 @@ int main(int argc, char *argv [])
                 exit(0);
             }
 
-            printf("%d bytes recieved, Request:\n", bytesrecieved);
-            printf("%s\n",buff);
+            servdeblog("%d bytes recieved, Request:\n", bytesrecieved);
+            servdeblog("%s\n",buff);
 
             request* r = allocreq();
             char* token;
@@ -187,7 +187,7 @@ int main(int argc, char *argv [])
             }
             r->httpver = cpynewstr(token); 
 
-            printf("Reqtype: '%s', Reqfile: '%s', httpver: '%s'\n",  r->reqtype, r->reqfile, r->httpver);
+            servdeblog("Reqtype: '%s', Reqfile: '%s', httpver: '%s'\n",  r->reqtype, r->reqfile, r->httpver);
 
 
             //Look for header ending 
@@ -195,7 +195,7 @@ int main(int argc, char *argv [])
             {
                 if(buff[i] == '\r' && buff[i-1] == '\n')
                 {
-                    printf("CLRF WAS found\n");
+                    servdeblog("CLRF WAS found\n");
                     break;
                 }
             }
@@ -207,7 +207,7 @@ int main(int argc, char *argv [])
             }
 
             /*
-               printf("Message Recieved: %s", buff);
+               servdeblog("Message Recieved: %s", buff);
                if (send(c, "Hello, world!", 13, 0) == -1)
                perror("send");
                exit(0);//*/
@@ -221,7 +221,7 @@ int main(int argc, char *argv [])
             strcpy(abspath, config->rootdir);
             strcat(abspath, r->reqfile);
 
-            printf("Abspath: '%s'\n", abspath);
+            servdeblog("Abspath: '%s'\n", abspath);
 
             FILE* f = fopen(abspath, "r"); //Open file for reading
             if(f == NULL)
@@ -247,8 +247,8 @@ int main(int argc, char *argv [])
 
             sprintf(resp->contlenstr, "Content-Length %d", resp->contlen);
 
-            printf("Content Length: %d\n", resp->contlen);
-            printf("Content Length String: %s\n", resp->contlenstr);
+            servdeblog("Content Length: %d\n", resp->contlen);
+            servdeblog("Content Length String: %s\n", resp->contlenstr);
 
             //Get length of response total
             n = strlen(resp->status) + strlen(resp->date) + strlen(resp->contype) + strlen(resp->contlenstr) + 10 + resp->contlen;
@@ -267,14 +267,14 @@ int main(int argc, char *argv [])
 
             n = strrchr(respbuff, '\0') - respbuff;
 
-            printf("Header: '%s'\n", respbuff);
-            printf("Last Occurrance of null char: %d\n", n);
+            servdeblog("Header: '%s'\n", respbuff);
+            servdeblog("Last Occurrance of null char: %d\n", n);
 
             //Copy file into buffer
             for(i=n;(respbuff[i] = getc(f))!=EOF; i++);
 
 
-            printf("Buffer: '%s\n'", respbuff);
+            servdeblog("Buffer: '%s\n'", respbuff);
 
             //for(n=0;(n += send(c,(&respbuff + n*sizeof(char) ),buffsize-n,0)) > 0;)
             int a = 0;

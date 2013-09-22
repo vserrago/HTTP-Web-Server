@@ -4,6 +4,9 @@
 #define MINPORTNUM 60000
 #define DEFAULTPORTNUM 61000
 
+//Global Vars
+unsigned char debugflag;    //Whether debug logging is enabled or not
+
 //Struct definitions
 typedef struct //stserver
 {
@@ -11,7 +14,6 @@ typedef struct //stserver
     char* port;                 //Port to listen on
     char* address;              //Ip address of the server
     char* confname;             //Name of config file
-    unsigned char debugflag;    //Whether debug logging is enabled or not
 }stserver;
 
 typedef struct //configuration
@@ -57,4 +59,4 @@ configuration* parseconf(char * confname);
 void exiterr(const char* format, ...);  //Exit with a given error message
 void exitperr(const char* format, ...); //Call perror and then exit
 void servlog(const char* format, ...);  //Log status of server
-void servdeblog(stserver* s, const char* format, ...); //Log debug info
+void servdeblog(const char* format, ...); //Log debug info
