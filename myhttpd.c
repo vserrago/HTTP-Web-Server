@@ -16,11 +16,10 @@
 #include "stserver.h"
 
 
-//Global Vars
+//Server Config Vars
 int sock;                           //Socket file descriptor
 char* port = "61000";               //TODO un-hardcode this!
 char* address = "localhost";        //TODO unhardcode this too!
-//unsigned char debugflag =0;         //Whether debug logging is enabled or not
 char* confname = "myhttpd.conf";    //Name of config file
 
 configuration* config;              //Config struct var
@@ -196,7 +195,7 @@ int main(int argc, char *argv [])
                servdeblog("Message Recieved: %s", buff);
                if (send(c, "Hello, world!", 13, 0) == -1)
                exitperr("send");
-               //*/
+            //*/
 
             //n = (strlen(config->rootdir) + strlen(r->reqfile) + 1)
             n = strlen(config->rootdir);
@@ -223,7 +222,7 @@ int main(int argc, char *argv [])
 
             for(n=0; getc(f)!=EOF; n++);
             resp->contlen = n;
-           // rewind(f);
+            // rewind(f);
             if(fseek(f, 0L, SEEK_SET) == -1)
             {
                 exitperr("fseek");
@@ -240,7 +239,7 @@ int main(int argc, char *argv [])
             //Make response buffer
             char* respbuff = malloc(n*sizeof(char));
             int buffsize = n;
-            
+
             strcpy(respbuff, resp->status);
             strcat(respbuff, resp->date);
             strcat(respbuff, resp->contype);
@@ -260,28 +259,9 @@ int main(int argc, char *argv [])
 
             servdeblog("Buffer: '%s\n'", respbuff);
 
-            //for(n=0;(n += send(c,(&respbuff + n*sizeof(char) ),buffsize-n,0)) > 0;)
             int a = 0;
-           // for(n=0;(n += send(c, respbuff+a*sizeof(char) ,100,0)) > 0;a+=100) // good one
-        for(n=0;(n += send(c, respbuff+a*sizeof(char) ,buffsize,0)) != 0;a+=n)
-            ; // good one
-          // while((n = send(c,respbuff,buffsize,0)) !=0)
-            //for(n=0;(n = send(c, respbuff+a*sizeof(char) ,buffsize-a,0)) > 0; a+=n)
-            //for(i=0; i< buffsize; i+=100)
-           /* {
-                n = send(c,respbuff,100,0);
-                if(n == 0)
-                {
-                    exiterr("send error 0 bytes\n");
-                }
-                if(n == -1)
-                {
-                    exiterr("send error\n");
-                }
-
-                servlog("Bytes sent: %d\n", n);
-                servlog("Sending info...\n");
-            }*/
+            for(n=0;(n += send(c, respbuff+a*sizeof(char) ,buffsize,0)) != 0;a+=n)
+                ; 
 
             servlog("Bytes sent: %d\n", n);
 
