@@ -17,11 +17,11 @@
 
 
 //Server Config Vars
-int sock;                           //Socket file descriptor
 char* port = "61000";               //TODO un-hardcode this!
 char* address = "localhost";        //TODO unhardcode this too!
 char* confname = "myhttpd.conf";    //Name of config file
 
+stserver* serv;                     //Server var
 configuration* config;              //Config struct var
 
 //Copies a string into a newly allocated char array
@@ -39,6 +39,9 @@ int main(int argc, char *argv [])
     int status;
     struct addrinfo hints;
     struct addrinfo* servinfo;
+
+    //Create server struct
+    serv = allocstserv();
 
     /* Arg Parsing */
     for(i=1; i<argc; i++)
@@ -82,6 +85,13 @@ int main(int argc, char *argv [])
         }
     }
 
+    //Set server vars
+    serv->port = port;
+    serv->address = address;
+    serv->confname = confname;
+
+    servdeblog("Server Address: '%s', Port: '%s', Confname: '%s'\n", serv->address, serv->port, serv->confname);
+
     config = parseconf(confname);   //Parse configuration file and get info from it.
 
 
@@ -99,14 +109,14 @@ int main(int argc, char *argv [])
     }
 
     //Create socket
-    sock = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
-    if(sock == -1)
+    serv->sock = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
+    if(serv->sock == -1)
     {
         exiterr("Socket error\n");
     }
 
     //Bind socket
-    if(bind(sock, servinfo->ai_addr, servinfo->ai_addrlen) != 0)
+    if(bind(serv->sock, servinfo->ai_addr, servinfo->ai_addrlen) != 0)
     {
         exiterr("binderror\n");
     }
@@ -114,7 +124,7 @@ int main(int argc, char *argv [])
     int backlog = 10; //Have a backlog of up to 10 requests
 
     //Listen on socket for incoming connections
-    if(listen(sock, backlog) != 0)
+    if(listen(serv->sock, backlog) != 0)
     {
         exiterr("Listen error\n");
     }
@@ -124,7 +134,7 @@ int main(int argc, char *argv [])
     servlog("Ready to recieve\n");
     for(;;) //Forever
     {
-        int c = accept(sock, (struct sockaddr *) &socket_st, &addr_size);
+        int c = accept(serv->sock, (struct sockaddr *) &socket_st, &addr_size);
 
         if(c < 0)
         {
@@ -272,7 +282,7 @@ int main(int argc, char *argv [])
     }
 
     //Finish Up
-    close(sock);
+    close(serv->sock);
     freeaddrinfo(servinfo); //Free address info
     exit(0);
 }
