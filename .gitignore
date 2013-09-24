@@ -25,3 +25,6 @@ server
 
 # Makefile dependency files
 *.dep
+
+# Dumped Cores
+core
