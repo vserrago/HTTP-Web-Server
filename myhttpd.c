@@ -35,7 +35,6 @@ int main(int argc, char *argv [])
 {
     int i, j;  //Loop Variables
     unsigned char portflag; //Command line param flags
-    struct sockaddr_storage socket_st;
 
     //Create server struct
     serv = allocstserv();
@@ -94,6 +93,7 @@ int main(int argc, char *argv [])
 
     prepserv(serv); //Create, bind and listen on port
 
+    struct sockaddr_storage socket_st;
     socklen_t addr_size = sizeof socket_st;
 
     servlog("Ready to recieve\n");
