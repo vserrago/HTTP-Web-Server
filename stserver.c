@@ -169,6 +169,48 @@ configuration* parseconf(char* confname)
     return c;
 }
 
+void prepserv(stserver* serv)
+{
+    int status;
+    struct addrinfo hints;
+    struct addrinfo* servinfo;
+
+    memset(&hints, 0, sizeof hints);    //Wipe space for hints
+    hints.ai_family = AF_UNSPEC;        //Don't specify IP type
+    hints.ai_socktype = SOCK_STREAM;    //Use TCP socket
+    hints.ai_flags = AI_PASSIVE;        //Figure out ip
+
+    //Get address info
+    if ((status = getaddrinfo(serv->address, serv->port, &hints, &servinfo)) != 0)
+    {
+        exiterr("getaddrinfo error: %s\n", gai_strerror(status));
+    }
+
+    //Create socket
+    serv->sock = socket(servinfo->ai_family, servinfo->ai_socktype, 
+            servinfo->ai_protocol);
+    if(serv->sock == -1)
+    {
+        exiterr("Socket error\n");
+    }
+
+    //Bind socket
+    if(bind(serv->sock, servinfo->ai_addr, servinfo->ai_addrlen) != 0)
+    {
+        exiterr("binderror\n");
+    }
+
+    int backlog = 10; //Have a backlog of up to 10 requests
+
+    //Listen on socket for incoming connections
+    if(listen(serv->sock, backlog) != 0)
+    {
+        exiterr("Listen error\n");
+    }
+    freeaddrinfo(servinfo); //Free address info
+
+}
+
 void exiterr(const char* format, ...)
 {
     va_list args;

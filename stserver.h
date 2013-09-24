@@ -58,6 +58,7 @@ void freeconf(configuration* c);
 
 //Server functions
 configuration* parseconf(char * confname);
+void prepserv(stserver* serv);
 void exiterr(const char* format, ...);  //Exit with a given error message
 void exitperr(const char* format, ...); //Call perror and then exit
 void servlog(const char* format, ...);  //Log status of server
