@@ -1,17 +1,32 @@
-#CC=clang
-CC=gcc
-OBJ=myhttpd.o stserver.o
-BINARY=server
+TARGET  := server
+SRCS    := myhttpd.c stserver.c
+OBJS    := ${SRCS:.c=.o} 
+DEPS    := ${SRCS:.c=.dep} 
+XDEPS   := $(wildcard ${DEPS}) 
 
-${BINARY}: Makefile ${OBJ}
-	${CC} -o ${BINARY} ${OBJ}
+CC      = gcc
+CCFLAGS = 
+LDFLAGS = 
+LIBS    = 
 
- myhttpd.o: myhttpd.c stserver.h
-	${CC} -c myhttpd.c
- 
- stserver.o: stserver.c stserver.h
-	${CC} -c stserver.c
- 
-clean:
-	rm ${OBJ} ${BINARY}
+.PHONY: all clean distclean 
+	all:: ${TARGET} 
+
+ifneq (${XDEPS},) 
+	include ${XDEPS} 
+endif 
+
+${TARGET}: ${OBJS} 
+	${CC} ${LDFLAGS} -o $@ $^ ${LIBS} 
+
+${OBJS}: %.o: %.c %.dep 
+	${CC} ${CCFLAGS} -o $@ -c $< 
+
+${DEPS}: %.dep: %.c Makefile 
+	${CC} ${CCFLAGS} -MM $< > $@ 
+
+clean:: 
+	-rm -f *~ *.o ${TARGET} 
+
+distclean:: clean
 

@@ -17,8 +17,11 @@
 *.out
 *.app
 
-#Vim files
+# Vim files
 *.swp
 
-#Named executables
+# Named executables
 server
+
+# Makefile dependency files
+*.dep
