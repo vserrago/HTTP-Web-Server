@@ -14,6 +14,7 @@
 
 //Local includes
 #include "stserver.h"
+#include "util.h"
 
 //Global var values
 unsigned char debugflag = 0; //False by default

@@ -1,0 +1,1 @@
+char* cpynewstr(char* source);

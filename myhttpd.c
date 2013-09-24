@@ -14,6 +14,7 @@
 
 //Local includes
 #include "stserver.h"
+#include "util.h"
 
 
 //Server Config Vars
@@ -23,13 +24,6 @@ char* confname = DEFAULTCONFNAME;   //Name of config file
 
 stserver* serv;                     //Server var
 configuration* config;              //Config struct var
-
-//Copies a string into a newly allocated char array
-char* cpynewstr(char* source) 
-{
-    int mlen = strlen(source)+1; 
-    return strcpy(malloc(mlen*sizeof(char)), source); 
-}
 
 int main(int argc, char *argv [])
 {
