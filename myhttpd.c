@@ -201,12 +201,6 @@ int main(int argc, char *argv [])
                 exiterr("CLRF not found\n");
             }
 
-            /*
-               servdeblog("Message Recieved: %s", buff);
-               if (send(c, "Hello, world!", 13, 0) == -1)
-               exitperr("send");
-            //*/
-
             //n = (strlen(config->rootdir) + strlen(r->reqfile) + 1)
             n = strlen(config->rootdir);
             n += strlen(r->reqfile) + 2;
@@ -244,7 +238,7 @@ int main(int argc, char *argv [])
             servdeblog("Content Length String: %s\n", resp->contlenstr);
 
             //Get length of response total
-            n = strlen(resp->status) + strlen(resp->date) + strlen(resp->contype) + strlen(resp->contlenstr) + 10 + resp->contlen;
+            n = strlen(resp->status) + strlen(resp->date) + strlen(resp->contype) + strlen(resp->contlenstr) + 1 + resp->contlen;
 
             //Make response buffer
             char* respbuff = malloc(n*sizeof(char));
