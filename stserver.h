@@ -3,6 +3,8 @@
 //Constants
 #define MINPORTNUM 60000
 #define DEFAULTPORTNUM 61000
+#define DEFAULTPORT "61000"
+#define DEFAULTCONFNAME "myhttpd.conf"
 
 //Global Vars
 unsigned char debugflag;    //Whether debug logging is enabled or not

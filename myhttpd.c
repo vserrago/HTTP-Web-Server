@@ -17,9 +17,9 @@
 
 
 //Server Config Vars
-char* port = "61000";               //TODO un-hardcode this!
-char* address = "localhost";        //TODO unhardcode this too!
-char* confname = "myhttpd.conf";    //Name of config file
+char* port = DEFAULTPORT;           //Port to listen in on 
+char* address = "localhost";        //Address of server
+char* confname = DEFAULTCONFNAME;   //Name of config file
 
 stserver* serv;                     //Server var
 configuration* config;              //Config struct var
@@ -90,7 +90,8 @@ int main(int argc, char *argv [])
     serv->address = address;
     serv->confname = confname;
 
-    servdeblog("Server Address: '%s', Port: '%s', Confname: '%s'\n", serv->address, serv->port, serv->confname);
+    servdeblog("Server Address: '%s', Port: '%s', Confname: '%s'\n", serv->address, 
+            serv->port, serv->confname);
 
     config = parseconf(confname);   //Parse configuration file and get info from it.
 
