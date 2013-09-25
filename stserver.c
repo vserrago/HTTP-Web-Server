@@ -209,7 +209,44 @@ void prepserv(stserver* serv)
         exiterr("Listen error\n");
     }
     freeaddrinfo(servinfo); //Free address info
+}
 
+request* parsereq(int mbs, char* buff)
+{
+    request* r = allocreq();
+
+    char* token;
+
+    int n;
+    unsigned char badreqflag = 0; //Bad request
+    unsigned char notfndflag = 0; //File not found
+    unsigned char rdpermflag = 0; //No read permissions
+
+    //Parse header request
+    if((token = strtok(buff," ")) == NULL)
+    {
+        badreqflag = 1;
+        exiterr("Buff Token error\n");
+    }
+    r->reqtype = cpynewstr(token); 
+
+    if((token = strtok(NULL," ")) == NULL)
+    {
+        exiterr("Buff Token error\n");
+        badreqflag = 1;
+    }
+    r->reqfile = cpynewstr(token); 
+
+    if((token = strtok(NULL," \r\n")) == NULL)
+    {
+        exiterr("Buff Token error\n");
+        badreqflag = 1;
+    }
+    r->httpver = cpynewstr(token); 
+
+    servdeblog("Reqtype: '%s', Reqfile: '%s', httpver: '%s'\n",  r->reqtype, r->reqfile, r->httpver);
+
+    return r;
 }
 
 void exiterr(const char* format, ...)

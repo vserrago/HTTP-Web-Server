@@ -103,7 +103,7 @@ int main(int argc, char *argv [])
         for(;;)
         {
             int mbs = 2048; //Maximum buffer size, size of 2KiB
-            char  buff [mbs];
+            char buff [mbs];
             int bytesrecieved = recv(c,buff, mbs,0);
 
             if(bytesrecieved < 0)
@@ -119,38 +119,7 @@ int main(int argc, char *argv [])
             servdeblog("%d bytes recieved, Request:\n", bytesrecieved);
             servdeblog("%s\n",buff);
 
-            request* r = allocreq();
-            char* token;
-
-            int n;
-            unsigned char badreqflag = 0; //Bad request
-            unsigned char notfndflag = 0; //File not found
-            unsigned char rdpermflag = 0; //No read permissions
-
-            //Parse header request
-            if((token = strtok(buff," ")) == NULL)
-            {
-                badreqflag = 1;
-                exiterr("Buff Token error\n");
-            }
-            r->reqtype = cpynewstr(token); 
-
-            if((token = strtok(NULL," ")) == NULL)
-            {
-                exiterr("Buff Token error\n");
-                badreqflag = 1;
-            }
-            r->reqfile = cpynewstr(token); 
-
-            if((token = strtok(NULL," \r\n")) == NULL)
-            {
-                exiterr("Buff Token error\n");
-                badreqflag = 1;
-            }
-            r->httpver = cpynewstr(token); 
-
-            servdeblog("Reqtype: '%s', Reqfile: '%s', httpver: '%s'\n",  r->reqtype, r->reqfile, r->httpver);
-
+            request* r = parsereq(mbs, buff);
 
             //Look for header ending 
             for(i=1;i<mbs;i++)
@@ -167,6 +136,7 @@ int main(int argc, char *argv [])
                 exiterr("CLRF not found\n");
             }
 
+            int n;
             //n = (strlen(config->rootdir) + strlen(r->reqfile) + 1)
             n = strlen(config->rootdir);
             n += strlen(r->reqfile) + 2;
