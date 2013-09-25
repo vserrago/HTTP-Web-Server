@@ -59,7 +59,14 @@ void freeconf(configuration* c);
 //Server functions
 configuration* parseconf(char * confname);
 void prepserv(stserver* serv);
+request* parsereq(int mbs, char* buff);
+response* handlereq(request* r);
+void sendresp(response* r);
+
+//Exit functions
 void exiterr(const char* format, ...);  //Exit with a given error message
 void exitperr(const char* format, ...); //Call perror and then exit
+
+//Log functions
 void servlog(const char* format, ...);  //Log status of server
 void servdeblog(const char* format, ...); //Log debug info
