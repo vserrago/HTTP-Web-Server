@@ -184,13 +184,8 @@ int main(int argc, char *argv [])
             resp->contype= cpynewstr("Content-Type: text/html\r\n");
             resp->contlenstr= malloc(50*sizeof(char));
 
-            for(n=0; getc(f)!=EOF; n++);
-            resp->contlen = n;
-            // rewind(f);
-            if(fseek(f, 0L, SEEK_SET) == -1)
-            {
-                exitperr("fseek");
-            }
+            //Get length of file
+            resp->contlen = filesize(f);
 
             sprintf(resp->contlenstr, "Content-Length %d", resp->contlen);
 
