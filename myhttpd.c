@@ -102,8 +102,9 @@ int main(int argc, char *argv [])
 
         for(;;)
         {
-            char  buff [1000];
-            int bytesrecieved = recv(c,buff, 1000,0);
+            int mbs = 2048; //Maximum buffer size, size of 2KiB
+            char  buff [mbs];
+            int bytesrecieved = recv(c,buff, mbs,0);
 
             if(bytesrecieved < 0)
             {
@@ -146,7 +147,7 @@ int main(int argc, char *argv [])
 
 
             //Look for header ending 
-            for(i=1;i<1000;i++)
+            for(i=1;i<mbs;i++)
             {
                 if(buff[i] == '\r' && buff[i-1] == '\n')
                 {
@@ -155,7 +156,7 @@ int main(int argc, char *argv [])
                 }
             }
             //Check to see if loop parsed through entire buffer
-            if(i == 1000-1)
+            if(i == mbs-1)
             {
                 exiterr("CLRF not found\n");
             }
