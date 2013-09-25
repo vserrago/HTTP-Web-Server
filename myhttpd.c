@@ -123,10 +123,14 @@ int main(int argc, char *argv [])
             char* token;
 
             int n;
+            unsigned char badreqflag = 0; //Bad request
+            unsigned char notfndflag = 0; //File not found
+            unsigned char rdpermflag = 0; //No read permissions
 
             //Parse header request
             if((token = strtok(buff," ")) == NULL)
             {
+                badreqflag = 1;
                 exiterr("Buff Token error\n");
             }
             r->reqtype = cpynewstr(token); 
@@ -134,12 +138,14 @@ int main(int argc, char *argv [])
             if((token = strtok(NULL," ")) == NULL)
             {
                 exiterr("Buff Token error\n");
+                badreqflag = 1;
             }
             r->reqfile = cpynewstr(token); 
 
             if((token = strtok(NULL," \r\n")) == NULL)
             {
                 exiterr("Buff Token error\n");
+                badreqflag = 1;
             }
             r->httpver = cpynewstr(token); 
 
@@ -175,6 +181,7 @@ int main(int argc, char *argv [])
             FILE* f = fopen(abspath, "r"); //Open file for reading
             if(f == NULL)
             {
+                //TODO Determine if 403 or 404
                 exitperr("fopen");
             }
 
