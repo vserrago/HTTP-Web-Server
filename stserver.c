@@ -196,6 +196,14 @@ void prepserv(stserver* serv)
         exiterr("Socket error\n");
     }
 
+    int yes=1;
+
+    //Make socket reusable
+    if (setsockopt(serv->sock,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int)) == -1) 
+    {
+        exitperr("setsockopt");
+    } 
+
     //Bind socket
     if(bind(serv->sock, servinfo->ai_addr, servinfo->ai_addrlen) != 0)
     {
@@ -221,7 +229,7 @@ char* recievereq(int sockfd)
 
     char* reqstr = malloc(mbs*sizeof(char)); //Allocate space for string
     reqstr[0] = '\0';   //Make empty string 
-       
+
     for(br=0; 0 < (br = recv(sockfd,buff, mbs,0)); )
     {
         //Concat contents into string
@@ -287,7 +295,7 @@ request* parsereq(char* reqstr)
         badreqflag = 1;
         goto badrequest;
     }
-        
+
     r->reqfile = cpynewstr(token); 
 
 
