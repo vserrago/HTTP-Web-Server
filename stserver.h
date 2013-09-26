@@ -15,6 +15,7 @@
 
 #define CONTYPETEXT "Content-Type: text/html\r\n"
 
+#define HTML201 "errpages/err201.htm"
 #define HTML400 "errpages/err400.htm"
 #define HTML403 "errpages/err403.htm"
 #define HTML404 "errpages/err404.htm"
