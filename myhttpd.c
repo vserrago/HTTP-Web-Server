@@ -108,74 +108,9 @@ int main(int argc, char *argv [])
 
             response* resp = handlereq(req, config);
 
-            /*
-            request* r = parsereq(reqstr);
-            int n;
-            //n = (strlen(config->rootdir) + strlen(r->reqfile) + 1)
-            n = strlen(config->rootdir);
-            n += strlen(r->reqfile) + 1;
-            //n += strlen(r->reqfile) + 2;
-            //Combine paths
-            char* abspath = malloc(
-                    n*sizeof(char));
-            strcpy(abspath, config->rootdir);
-            strcat(abspath, r->reqfile);
+            sendresp(c,resp);
 
-            servdeblog("Abspath: '%s'\n", abspath);
-
-            FILE* f = fopen(abspath, "r"); //Open file for reading
-            if(f == NULL)
-            {
-                //TODO Determine if 403 or 404
-                exitperr("fopen");
-            }
-
-            response* resp = allocresp();
-            resp->status = cpynewstr("HTTP/1.0 200 OK\r\n");
-            resp->date = cpynewstr("Date: Fri, 31 Dec 1999 23:59:59 GMT\r\n");
-            resp->contype= cpynewstr("Content-Type: text/html\r\n");
-            resp->contlenstr= malloc(50*sizeof(char));
-
-            //Get length of file
-            resp->contlen = filesize(f);
-
-            sprintf(resp->contlenstr, "Content-Length %d", resp->contlen);
-
-            servdeblog("Content Length: %d\n", resp->contlen);
-            servdeblog("Content Length String: %s\n", resp->contlenstr);
-
-            //Get length of response total
-            n = strlen(resp->status) + strlen(resp->date) + strlen(resp->contype) + strlen(resp->contlenstr) + 1 + resp->contlen;
-
-            //Make response buffer
-            char* respbuff = malloc(n*sizeof(char));
-            int buffsize = n;
-
-            strcpy(respbuff, resp->status);
-            strcat(respbuff, resp->date);
-            strcat(respbuff, resp->contype);
-            strcat(respbuff, resp->contlenstr);
-            strcat(respbuff, "\r\n");
-            strcat(respbuff, "\r\n");
-
-
-            n = strrchr(respbuff, '\0') - respbuff;
-
-            servdeblog("Header: '%s'\n", respbuff);
-            servdeblog("Last Occurrance of null char: %d\n", n);
-
-            //Copy file into buffer
-            for(i=n;(respbuff[i] = getc(f))!=EOF; i++);
-
-
-            servdeblog("Buffer: '%s\n'", respbuff);
-
-            int a = 0;
-            for(n=0;(n += send(c, respbuff+a*sizeof(char) ,buffsize,0)) != 0;a+=n)
-                ; 
-
-            servlog("Bytes sent: %d\n", n);
-            //*/
+            //TODO free everything
             break;
         }
         close(c);

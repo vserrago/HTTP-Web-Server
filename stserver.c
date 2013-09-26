@@ -406,6 +406,62 @@ response* handlereq(request* req, configuration* config)
     return resp;
 }
 
+void sendresp(int sockfd, response* resp)
+{
+    int resplen = 0; //Response length in bytes
+    //Get lengths of each response section, if it isn't null
+    if(resp->status != NULL)
+        resplen += strlen(resp->status);
+    if(resp->date != NULL)
+        resplen += strlen(resp->date);
+    if(resp->contype != NULL)
+        resplen += strlen(resp->contype);
+    if(resp->contlenstr != NULL)
+        resplen += strlen(resp->contlenstr);
+    if(resp->content != NULL)
+        resplen += strlen(resp->content);
+    
+    //resplen += 4; //Add two CRLFs
+    resplen += 6; //Add three CRLFs
+    resplen += 1; //Add 1 for null-terminator
+    //resplen += 10; //Add extra space
+
+    servdeblog("Response is %d bytes long\n", resplen);
+
+    //Make string
+    char* respstr = malloc(resplen*sizeof(char));
+    respstr[0] = '\0';   //Make string empty
+
+    //Turn response into 1 long string
+    if(resp->status != NULL)
+        strcat(respstr, resp->status);
+    if(resp->date != NULL)
+        strcat(respstr, resp->date);
+    if(resp->contype != NULL)
+        strcat(respstr, resp->contype);
+    if(resp->contlenstr != NULL)
+        strcat(respstr, resp->contlenstr);
+    //Add two CRLFs
+    strcat(respstr, "\r\n\r\n");
+    if(resp->content != NULL)
+        strcat(respstr, resp->content);
+    strcat(respstr, "\r\n");
+
+    servdeblog("String to send: '%s'\n",respstr);
+
+    int bs;  //Bytes sent
+    int tbs; //Total bytes sent
+
+    for(bs=0, tbs=0; (bs = send(sockfd, respstr+(tbs*sizeof(char)),resplen-tbs-1,0)) != 0; tbs += bs)
+    {
+        servdeblog("Bytes sent: %d\n", bs);
+        if(bs < 0)
+            exitperr("send");
+    }
+
+    servlog("Request served. %d bytes sent.\n",tbs);
+}
+
 void exiterr(const char* format, ...)
 {
     va_list args;

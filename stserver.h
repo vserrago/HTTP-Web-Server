@@ -73,7 +73,7 @@ void prepserv(stserver* serv);
 char* recievereq(int sockfd);
 request* parsereq(char* reqstr);
 response* handlereq(request* req, configuration* config);
-void sendresp(response* r);
+void sendresp(int sockfd, response* resp);
 
 //Exit functions
 void exiterr(const char* format, ...);  //Exit with a given error message
