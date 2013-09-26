@@ -227,6 +227,7 @@ char* recievereq(int sockfd)
     int  mbs = 1024;    //Maximum buffer size, size of 2KiB
     char buff [mbs];    //Buffer to recieve from
     int  br = 0;        //Bytes recieved
+    unsigned char postflag = 0; //If we are waiting for a post request
 
     char* reqstr = malloc(mbs*sizeof(char)); //Allocate space for string
     reqstr[0] = '\0';   //Make empty string 
@@ -238,8 +239,23 @@ char* recievereq(int sockfd)
 
         servdeblog("Request string: %s\n", reqstr);
 
+        char* contlen;
         char* crlfs;
-        if((crlfs = strstr(reqstr, "\r\n\r\n"))!= NULL)
+        if((crlfs = strstr(reqstr, "\r\n\r\n"))!= NULL && !postflag)
+        {
+            //Check for content length header //16 chars until number
+            if((contlen = strstr(reqstr, "Content-Length:"))!= NULL)
+            {
+                postflag = 1;
+                servdeblog("Postflag\n");
+            }
+            else
+            {
+                servdeblog("End found\n");
+                break;
+            }
+        }
+        else if((crlfs = strstr(reqstr, "\r\n"))!= NULL && postflag)
         {
             servdeblog("End found\n");
             break;
