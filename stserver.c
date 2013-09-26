@@ -48,6 +48,7 @@ request* allocreq(void)
 {
     request* r = malloc(sizeof(request));
 
+    r->badreq  = 0;     //Valid by default
     r->reqtype = NULL;
     r->reqfile = NULL;
     r->httpver = NULL;
@@ -251,40 +252,75 @@ char* recievereq(int sockfd)
     return reqstr;
 }
 
-request* parsereq(int mbs, char* buff)
+request* parsereq(char* reqstr)
 {
     request* r = allocreq();
 
     char* token;
-
-    int n;
     unsigned char badreqflag = 0; //Bad request
-    unsigned char notfndflag = 0; //File not found
-    unsigned char rdpermflag = 0; //No read permissions
 
     //Parse header request
-    if((token = strtok(buff," ")) == NULL)
+    if((token = strtok(reqstr," ")) == NULL)
     {
+        servdeblog("Header not found\n");
         badreqflag = 1;
-        exiterr("Buff Token error\n");
+        goto badrequest;
     }
+    /* Don't check for correct method type here, as that will be done when
+     * creating a response so that a 501 NOT IMPLEMENTED can be returned.
+     */
     r->reqtype = cpynewstr(token); 
 
+
+    //Parse file request
     if((token = strtok(NULL," ")) == NULL)
     {
-        exiterr("Buff Token error\n");
+        servdeblog("File path not found\n");
         badreqflag = 1;
+        goto badrequest;
     }
+
+    //Check to see if a leading / is given in file path
+    if(token[0] != '/')
+    {
+        servdeblog("Invalid filepath\n");
+        badreqflag = 1;
+        goto badrequest;
+    }
+        
     r->reqfile = cpynewstr(token); 
 
+
+    //Parse HTTPver
     if((token = strtok(NULL," \r\n")) == NULL)
     {
-        exiterr("Buff Token error\n");
+        servdeblog("HTTPver not found\n");
         badreqflag = 1;
+        goto badrequest;
     }
+
+    //If httpver is both not 1.0 or 1.1
+    if(strcmp(token,"HTTP/1.0") != 0 && strcmp(token, "HTTP/1.1") != 0)
+    {
+        servdeblog("Invalid HTTPver\n");
+        badreqflag = 1;
+        goto badrequest;
+    }
+
     r->httpver = cpynewstr(token); 
 
     servdeblog("Reqtype: '%s', Reqfile: '%s', httpver: '%s'\n",  r->reqtype, r->reqfile, r->httpver);
+
+badrequest:
+    if(badreqflag)
+    {
+        /* If a request is found to be bad while parsing through it, then we
+         * don't want to attempt to parse through the rest. If r->badreq is
+         * true, then we don't care about the rest of request as it's invalid.
+         */
+        r->badreq = 1;
+        servdeblog("Bad request detected\n");
+    }
 
     return r;
 }

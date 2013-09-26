@@ -102,49 +102,9 @@ int main(int argc, char *argv [])
 
         for(;;)
         {
-            int mbs = 2048; //Maximum buffer size, size of 2KiB
-            char buff [mbs];
-            /*
-            int bytesrecieved = recv(c,buff, mbs,0);
+            char* reqstr = recievereq(c); //Get resquest in a string format
 
-            if(bytesrecieved < 0)
-            {
-                exiterr("Recieve Error\n");
-            }
-
-            if(bytesrecieved == 0)
-            {
-                exiterr("Connection Closed\n");
-            }
-
-            servdeblog("%d bytes recieved, Request:\n", bytesrecieved);
-            servdeblog("%s\n",buff);
-            */
-            char* reqstr = recievereq(c);
-
-
-
-            exit(0); //TODO REMOVE THIS CALL WHEN DONE DEBUGGING
-
-
-
-
-            request* r = parsereq(mbs, buff);
-
-            //Look for header ending 
-            for(i=1;i<mbs;i++)
-            {
-                if(buff[i] == '\r' && buff[i-1] == '\n')
-                {
-                    servdeblog("CLRF WAS found\n");
-                    break;
-                }
-            }
-            //Check to see if loop parsed through entire buffer
-            if(i == mbs-1)
-            {
-                exiterr("CLRF not found\n");
-            }
+            request* r = parsereq(reqstr);
 
             int n;
             //n = (strlen(config->rootdir) + strlen(r->reqfile) + 1)

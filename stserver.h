@@ -28,6 +28,7 @@ typedef struct //configuration
 
 typedef struct //request
 {
+    unsigned char badreq; //Flag for if request is not valid
     char* reqtype;  //Requested type, Ex GET
     char* reqfile;  //Requested file
     char* httpver;  //HTTP version
@@ -60,7 +61,7 @@ void freeconf(configuration* c);
 configuration* parseconf(char * confname);
 void prepserv(stserver* serv);
 char* recievereq(int sockfd);
-request* parsereq(int mbs, char* buff);
+request* parsereq(char* buff);
 response* handlereq(request* r);
 void sendresp(response* r);
 
