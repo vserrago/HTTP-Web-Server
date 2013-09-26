@@ -15,6 +15,11 @@
 
 #define CONTYPETEXT "Content-Type: text/html\r\n"
 
+#define HTML400 "errpages/err400.htm"
+#define HTML403 "errpages/err403.htm"
+#define HTML404 "errpages/err404.htm"
+#define HTML501 "errpages/err501.htm"
+
 //Global Vars
 unsigned char debugflag;    //Whether debug logging is enabled or not
 
@@ -74,6 +79,7 @@ char* recievereq(int sockfd);
 request* parsereq(char* reqstr);
 response* handlereq(request* req, configuration* config);
 void sendresp(int sockfd, response* resp);
+char* getdate(void);
 
 //Exit functions
 void exiterr(const char* format, ...);  //Exit with a given error message

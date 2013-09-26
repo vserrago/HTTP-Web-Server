@@ -339,6 +339,7 @@ response* handlereq(request* req, configuration* config)
     unsigned char notimplflag = 0; //Not implemented flag
     unsigned char badpermflag = 0; //No read permissions flag
     unsigned char notfndflag  = 0; //Not found flag
+    unsigned char headreqflag = 0; //Error must return head if requesting head
 
     char* filepath; //Full path for requested file
     FILE* f;
@@ -349,10 +350,15 @@ response* handlereq(request* req, configuration* config)
     //If invalid request
     if(req->badreq)
     {
+        goto errors;
     }
     //If get or head request
     else if(strcmp(req->reqtype, "GET") == 0 || strcmp(req->reqtype, "HEAD") == 0)
     {
+        //Set head flag in case of an error
+        if(strcmp(req->reqtype, "HEAD") == 0)
+            headreqflag = 1;
+
         filepath = cmbnewstr(config->rootdir, req->reqfile);
         servdeblog("File path: %s\n", filepath);
 
@@ -371,11 +377,14 @@ response* handlereq(request* req, configuration* config)
                 servdeblog("File cannot be read\n");
                 badpermflag = 1;
             }
+
+            //Either way go to errors
+            goto errors;
         }
 
         //Set response info
         resp->status = cpynewstr(ST200); //Request is ok
-        resp->date = cpynewstr("Date: Fri, 31 Dec 1999 23:59:59 GMT\r\n");
+        resp->date = getdate();
         resp->contype= cpynewstr(CONTYPETEXT);
         //Allocate enough space for any content size
         resp->contlenstr= malloc(50*sizeof(char)); 
@@ -392,6 +401,7 @@ response* handlereq(request* req, configuration* config)
             resp->content = readfile(resp->contlen, f);
             servdeblog("Content to send: '%s'\n",resp->content);
         }
+        fclose(f);
     }
     //If post request
     else if(strcmp(req->reqtype, "POST") == 0)
@@ -402,9 +412,68 @@ response* handlereq(request* req, configuration* config)
     {
         servdeblog("Header not implemented: %s\n", req->reqtype);
         notimplflag = 1;
+        goto errors;
+    }
+
+errors: //Handle errors
+    //If at least one error has occurred
+    if(req->badreq || notimplflag || badpermflag || notfndflag)
+    {
+        //Get rid of previous info, and fill out resp with new info
+        freeresp(resp);
+        resp = allocresp();
+
+        resp->date = getdate();
+        resp->contype = cpynewstr(CONTYPETEXT);
+
+        if(req->badreq)
+        {
+            resp->status = cpynewstr(ST400);
+
+            if((f = fopen(HTML400,"r")) == NULL)
+                exiterr("Error file error\n");
+        }
+        else if(notimplflag)
+        {
+            resp->status = cpynewstr(ST501);
+
+            if((f = fopen(HTML501,"r")) == NULL)
+                exiterr("Error file error\n");
+        }
+        else if(badpermflag)
+        {
+            resp->status = cpynewstr(ST403);
+
+            if((f = fopen(HTML403,"r")) == NULL)
+                exiterr("Error file error\n");
+        }
+        else if(notfndflag)
+        {
+            resp->status = cpynewstr(ST404);
+
+            if((f = fopen(HTML404,"r")) == NULL)
+                exiterr("Error file error\n");
+        }
+
+        //Get content length
+        resp->contlen = filesize(f);
+        resp->contlenstr= malloc(50*sizeof(char)); 
+        sprintf(resp->contlenstr, "Content-Length %d", resp->contlen);
+
+        //If get req
+        if(!headreqflag)
+            resp->content = readfile(resp->contlen, f);
+        fclose(f);
     }
 
     return resp;
+}
+
+//Gets the current date
+char* getdate(void)
+{
+    //TODO get actual date
+    return cpynewstr("Date: Fri, 31 Dec 1999 23:59:59 GMT\r\n");
 }
 
 void sendresp(int sockfd, response* resp)
@@ -421,7 +490,7 @@ void sendresp(int sockfd, response* resp)
         resplen += strlen(resp->contlenstr);
     if(resp->content != NULL)
         resplen += strlen(resp->content);
-    
+
     //resplen += 4; //Add two CRLFs
     resplen += 6; //Add three CRLFs
     resplen += 1; //Add 1 for null-terminator
