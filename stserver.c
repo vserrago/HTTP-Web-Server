@@ -350,8 +350,8 @@ response* handlereq(request* req, configuration* config)
     if(req->badreq)
     {
     }
-    //If get request
-    else if(strcmp(req->reqtype, "GET") == 0)
+    //If get or head request
+    else if(strcmp(req->reqtype, "GET") == 0 || strcmp(req->reqtype, "HEAD") == 0)
     {
         filepath = cmbnewstr(config->rootdir, req->reqfile);
         servdeblog("File path: %s\n", filepath);
@@ -385,12 +385,13 @@ response* handlereq(request* req, configuration* config)
         //Print length to string
         sprintf(resp->contlenstr, "Content-Length %d", resp->contlen);
 
-        resp->content = readfile(resp->contlen, f);
-        servdeblog("Content to send: '%s'\n",resp->content);
-    }
-    //If head request
-    else if(strcmp(req->reqtype, "HEAD") == 0)
-    {
+        //Only add content if reqtype is GET
+        if(strcmp(req->reqtype, "GET") == 0)
+        {
+            //Add content to response
+            resp->content = readfile(resp->contlen, f);
+            servdeblog("Content to send: '%s'\n",resp->content);
+        }
     }
     //If post request
     else if(strcmp(req->reqtype, "POST") == 0)
@@ -444,8 +445,10 @@ void sendresp(int sockfd, response* resp)
     //Add two CRLFs
     strcat(respstr, "\r\n\r\n");
     if(resp->content != NULL)
+    {
         strcat(respstr, resp->content);
-    strcat(respstr, "\r\n");
+        strcat(respstr, "\r\n");
+    }
 
     servdeblog("String to send: '%s'\n",respstr);
 
