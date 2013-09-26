@@ -70,11 +70,12 @@ response* allocresp(void)
 {
     response* r = malloc(sizeof(response));
 
-    r->status =NULL;
-    r->date =NULL;
-    r->contype =NULL;
-    r->contlenstr = NULL;
-    r->contlen =0;
+    r->status       = NULL;
+    r->date         = NULL;
+    r->contype      = NULL;
+    r->contlenstr   = NULL;
+    r->content      = NULL;
+    r->contlen      = 0;
 
     return r;
 }
@@ -331,6 +332,63 @@ badrequest:
     }
 
     return r;
+}
+
+response* handlereq(request* req, configuration* config)
+{
+    unsigned char notimplflag = 0; //Not implemented flag
+    unsigned char badpermflag = 0; //No read permissions flag
+    unsigned char notfndflag  = 0; //Not found flag
+
+    char* filepath; //Full path for requested file
+    FILE* f;
+
+    //TODO: Return index.htm if file given is "/"
+
+    response* resp = allocresp();
+    //If invalid request
+    if(req->badreq)
+    {
+    }
+    //If get request
+    else if(strcmp(req->reqtype, "GET") == 0)
+    {
+        filepath = cmbnewstr(config->rootdir, req->reqfile);
+        servdeblog("File path: %s\n", filepath);
+
+        //Open file
+        if((f = fopen(filepath,"r")) == NULL)
+        {
+            //If file does not exist
+            if(errno == ENOENT)
+            {
+                servdeblog("File not found\n");
+                notfndflag = 1;
+            }
+            //Else bad read permissions
+            else
+            {
+                servdeblog("File cannot be read\n");
+                badpermflag = 1;
+            }
+        }
+    }
+    //If head request
+    else if(strcmp(req->reqtype, "HEAD") == 0)
+    {
+    }
+    //If post request
+    else if(strcmp(req->reqtype, "POST") == 0)
+    {
+    }
+    //Else unimplemented request
+    else
+    {
+        servdeblog("Header not implemented: %s\n", req->reqtype);
+        notimplflag = 1;
+    }
+
+    return resp;
 }
 
 void exiterr(const char* format, ...)

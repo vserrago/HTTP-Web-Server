@@ -36,11 +36,12 @@ typedef struct //request
 
 typedef struct response
 {
-    char* status;   //Status line, ex HTTP/1.0 200 OK
-    char* date;
-    char* contype;  //Content-Type
-    char* contlenstr;  //Content-length string
-    int  contlen;  //Content-length
+    char* status;       //Status line, ex HTTP/1.0 200 OK
+    char* date;         //Date
+    char* contype;      //Content-Type
+    char* contlenstr;   //Content-length string
+    char* content;      //Content to return as a string
+    int   contlen;      //Content-length
 }response;
 
 
@@ -62,7 +63,7 @@ configuration* parseconf(char * confname);
 void prepserv(stserver* serv);
 char* recievereq(int sockfd);
 request* parsereq(char* reqstr);
-response* handlereq(request* r);
+response* handlereq(request* req, configuration* config);
 void sendresp(response* r);
 
 //Exit functions

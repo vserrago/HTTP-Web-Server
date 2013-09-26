@@ -104,12 +104,17 @@ int main(int argc, char *argv [])
         {
             char* reqstr = recievereq(c); //Get resquest in a string format
 
-            request* r = parsereq(reqstr);
+            request* req = parsereq(reqstr);
 
+            response* resp = handlereq(req, config);
+
+            /*
+            request* r = parsereq(reqstr);
             int n;
             //n = (strlen(config->rootdir) + strlen(r->reqfile) + 1)
             n = strlen(config->rootdir);
-            n += strlen(r->reqfile) + 2;
+            n += strlen(r->reqfile) + 1;
+            //n += strlen(r->reqfile) + 2;
             //Combine paths
             char* abspath = malloc(
                     n*sizeof(char));
@@ -170,7 +175,7 @@ int main(int argc, char *argv [])
                 ; 
 
             servlog("Bytes sent: %d\n", n);
-
+            //*/
             break;
         }
         close(c);
