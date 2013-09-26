@@ -100,25 +100,25 @@ int main(int argc, char *argv [])
             exiterr("Accept error\n");
         }
 
-        for(;;)
-        {
-            char* reqstr = recievereq(c); //Get resquest in a string format
+        char* reqstr = recievereq(c); //Get resquest in a string format
 
-            request* req = parsereq(reqstr);
+        request* req = parsereq(reqstr);
 
-            response* resp = handlereq(req, config);
+        response* resp = handlereq(req, config);
 
-            sendresp(c,resp);
+        sendresp(c,resp);
 
-            //TODO free everything
-            break;
-        }
+        //TODO free everything
+        free(reqstr);
+        freereq(req);
+        freeresp(resp);
+
+        //Close connection
         close(c);
         break;
     }
 
     //Finish Up
-    //close(serv->sock);
-    //freeaddrinfo(servinfo); //Free address info
+    close(serv->sock);
     exit(0);
 }

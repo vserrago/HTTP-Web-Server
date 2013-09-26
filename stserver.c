@@ -463,6 +463,9 @@ void sendresp(int sockfd, response* resp)
     }
 
     servlog("Request served. %d bytes sent.\n",tbs);
+
+    //Free string
+    free(respstr);
 }
 
 void exiterr(const char* format, ...)
