@@ -468,7 +468,42 @@ response* handlereq(request* req, configuration* config)
     //If post request
     else if(strcmp(req->reqtype, "POST") == 0)
     {
+        //Attempt to open file
+        filepath = cmbnewstr(config->rootdir, req->reqfile);
+        servdeblog("File path: %s\n", filepath);
 
+        if((f = fopen(filepath,"w")) == NULL)
+        {
+            servdeblog("Post open file error\n");
+            //Only thing that can happen is bad permissions
+            badpermflag = 1;
+            goto errors;
+        }
+
+        //Write data to file
+        if( fputs(req->content, f) == EOF)
+        {
+            servdeblog("Fputs EOF error\n");
+            badpermflag = 1;
+            goto errors;
+        }
+        fclose(f);
+
+        resp->status = cpynewstr(ST201);
+        resp->date = getdate();
+
+
+        if((f = fopen(HTML201,"r")) == NULL)
+            exiterr("Error file error\n");
+        //Get content length
+        resp->contlen = filesize(f);
+        resp->contlenstr= malloc(50*sizeof(char)); 
+        sprintf(resp->contlenstr, "Content-Length %d", resp->contlen);
+
+        //If get req
+        if(!headreqflag)
+            resp->content = readfile(resp->contlen, f);
+        fclose(f);
     }
     //Else unimplemented request
     else
