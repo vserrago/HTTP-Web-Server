@@ -46,6 +46,8 @@ typedef struct //request
     char* reqtype;  //Requested type, Ex GET
     char* reqfile;  //Requested file
     char* httpver;  //HTTP version
+    char* content;  //Content from post
+    int   contlen;  //Length of content
 }request;
 
 typedef struct response

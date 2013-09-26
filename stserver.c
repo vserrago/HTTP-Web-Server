@@ -52,6 +52,8 @@ request* allocreq(void)
     r->reqtype = NULL;
     r->reqfile = NULL;
     r->httpver = NULL;
+    r->content = NULL;
+    r->contlen = 0;
 
     return r;
 }
@@ -62,6 +64,7 @@ void freereq(request* r)
     free(r->reqtype);
     free(r->reqfile);
     free(r->httpver);
+    free(r->content);
     //Free struct
     free(r);
 }
@@ -251,13 +254,13 @@ char* recievereq(int sockfd)
             }
             else
             {
-                servdeblog("End found\n");
+                servdeblog("Regular End found\n");
                 break;
             }
         }
         else if((crlfs = strstr(reqstr, "\r\n"))!= NULL && postflag)
         {
-            servdeblog("End found\n");
+            servdeblog("POST End found\n");
             break;
         }
     }
@@ -279,6 +282,11 @@ char* recievereq(int sockfd)
 
 request* parsereq(char* reqstr)
 {
+    servdeblog("ABSOLUTELY NO parsing on string '%s'\n", reqstr);
+    //TODO Find out why reqstr doesn't work. May have to do with strtok
+    char* postreqstr = cpynewstr(reqstr);
+    servdeblog("ABSOLUTELY NO parsing on string '%s'\n", postreqstr);
+
     request* r = allocreq();
 
     char* token;
@@ -333,6 +341,44 @@ request* parsereq(char* reqstr)
     }
 
     r->httpver = cpynewstr(token); 
+
+    servdeblog("PRE-POST parsing on string '%s'\n", postreqstr);
+
+    char* contlenp;
+    //HTTP POST-specific parsing
+    if(strcmp(r->reqtype, "POST") == 0)
+    {
+        servdeblog("POST parsing on string '%s'\n", postreqstr);
+        //If content-length exists
+        if((contlenp = strstr(postreqstr,"Content-Length")) != NULL)
+        {
+            r->contlen = atoi(contlenp+(16*sizeof(char)));
+            servdeblog("Content Length: %d\n",r->contlen);
+        }
+        else
+        {
+            servdeblog("No contlen\n");
+            badreqflag = 1;
+            goto badrequest;
+        }
+
+        char* crlfs;
+        if((crlfs = strstr(postreqstr, "\r\n\r\n"))!= NULL)
+        {
+            crlfs +=4; //go to beginning of chars to read in
+            r->content = malloc((r->contlen+1)*sizeof(char));
+            r->content[0] = '\0';
+            strncat(r->content,crlfs,r->contlen);
+            servdeblog("Read-in content: '%s'\n",r->content);
+        }
+        else
+        {
+            servdeblog("No actual content in '%s'\n", postreqstr);
+            badreqflag = 1;
+            goto badrequest;
+        }
+
+    }
 
     servdeblog("Reqtype: '%s', Reqfile: '%s', httpver: '%s'\n",  r->reqtype, r->reqfile, r->httpver);
 
@@ -422,6 +468,7 @@ response* handlereq(request* req, configuration* config)
     //If post request
     else if(strcmp(req->reqtype, "POST") == 0)
     {
+
     }
     //Else unimplemented request
     else
