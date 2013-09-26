@@ -59,6 +59,7 @@ void freeconf(configuration* c);
 //Server functions
 configuration* parseconf(char * confname);
 void prepserv(stserver* serv);
+char* recievereq(int sockfd);
 request* parsereq(int mbs, char* buff);
 response* handlereq(request* r);
 void sendresp(response* r);

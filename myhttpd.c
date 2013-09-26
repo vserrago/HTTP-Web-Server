@@ -104,6 +104,7 @@ int main(int argc, char *argv [])
         {
             int mbs = 2048; //Maximum buffer size, size of 2KiB
             char buff [mbs];
+            /*
             int bytesrecieved = recv(c,buff, mbs,0);
 
             if(bytesrecieved < 0)
@@ -118,6 +119,15 @@ int main(int argc, char *argv [])
 
             servdeblog("%d bytes recieved, Request:\n", bytesrecieved);
             servdeblog("%s\n",buff);
+            */
+            char* reqstr = recievereq(c);
+
+
+
+            exit(0); //TODO REMOVE THIS CALL WHEN DONE DEBUGGING
+
+
+
 
             request* r = parsereq(mbs, buff);
 

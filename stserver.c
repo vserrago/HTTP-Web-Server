@@ -211,6 +211,46 @@ void prepserv(stserver* serv)
     freeaddrinfo(servinfo); //Free address info
 }
 
+char* recievereq(int sockfd)
+{
+
+    int  mbs = 1024;    //Maximum buffer size, size of 2KiB
+    char buff [mbs];    //Buffer to recieve from
+    int  br = 0;        //Bytes recieved
+
+    char* reqstr = malloc(mbs*sizeof(char)); //Allocate space for string
+    reqstr[0] = '\0';   //Make empty string 
+       
+    for(br=0; 0 < (br = recv(sockfd,buff, mbs,0)); )
+    {
+        //Concat contents into string
+        strncat(reqstr,buff, br*sizeof(char));
+
+        servdeblog("Request string: %s\n", reqstr);
+
+        char* crlfs;
+        if((crlfs = strstr(reqstr, "\r\n\r\n"))!= NULL)
+        {
+            servdeblog("End found\n");
+            break;
+        }
+    }
+
+    if(br < 0)
+    {
+        exiterr("Recieve Error\n");
+    }
+
+    if(br == 0)
+    {
+        exiterr("Connection Closed\n");
+    }
+
+    servdeblog("%d bytes recieved, Request:\n", strlen(reqstr));
+    servdeblog("'%s'\n",reqstr);
+    return reqstr;
+}
+
 request* parsereq(int mbs, char* buff)
 {
     request* r = allocreq();
