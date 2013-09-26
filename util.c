@@ -40,3 +40,22 @@ int filesize(FILE* f)
 
     return n; 
 }
+
+//Reads in a file, given its size in bytes
+char* readfile(int filesize, FILE* f)
+{
+    //Allocate filesize + 1 bytes (for null-terminator)
+    char* filestr = malloc((filesize+1)*sizeof(char));
+
+    int n;
+
+    for(n=0; n<filesize; n++)
+    {
+        filestr[n] = getc(f);
+    }
+
+    //Set last character as null-terminator
+    filestr[filesize] = '\0';
+
+    return filestr;
+}

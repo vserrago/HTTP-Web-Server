@@ -6,6 +6,15 @@
 #define DEFAULTPORT "61000"
 #define DEFAULTCONFNAME "myhttpd.conf"
 
+#define ST200 "HTTP/1.0 200 OK\r\n"
+#define ST201 "HTTP/1.0 201 File created successfully\r\n"
+#define ST400 "HTTP/1.0 400 Bad request\r\n"
+#define ST403 "HTTP/1.0 403 No read permissions\r\n"
+#define ST404 "HTTP/1.0 404 Not found\r\n"
+#define ST501 "HTTP/1.0 501 Not implemented\r\n"
+
+#define CONTYPETEXT "Content-Type: text/html\r\n"
+
 //Global Vars
 unsigned char debugflag;    //Whether debug logging is enabled or not
 

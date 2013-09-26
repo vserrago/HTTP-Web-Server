@@ -94,7 +94,7 @@ void freeresp(response* r)
 configuration* allocconf(void)
 {
     configuration* c = malloc(sizeof(configuration));   //Create struct
-    
+
     //Set each value to a defualt value
     c->httpver = NULL;
     c->rootdir = NULL;
@@ -117,7 +117,7 @@ void freeconf(configuration* c)
 configuration* parseconf(char* confname)
 {
     configuration* c = allocconf();
-    
+
     FILE* f = fopen(confname, "r"); //Open file for reading
 
     if(f == NULL)
@@ -366,12 +366,27 @@ response* handlereq(request* req, configuration* config)
                 notfndflag = 1;
             }
             //Else bad read permissions
-            else
+            else //TODO find errno code
             {
                 servdeblog("File cannot be read\n");
                 badpermflag = 1;
             }
         }
+
+        //Set response info
+        resp->status = cpynewstr(ST200); //Request is ok
+        resp->date = cpynewstr("Date: Fri, 31 Dec 1999 23:59:59 GMT\r\n");
+        resp->contype= cpynewstr(CONTYPETEXT);
+        //Allocate enough space for any content size
+        resp->contlenstr= malloc(50*sizeof(char)); 
+
+        //Get file length
+        resp->contlen = filesize(f);
+        //Print length to string
+        sprintf(resp->contlenstr, "Content-Length %d", resp->contlen);
+
+        resp->content = readfile(resp->contlen, f);
+        servdeblog("Content to send: '%s'\n",resp->content);
     }
     //If head request
     else if(strcmp(req->reqtype, "HEAD") == 0)

@@ -6,3 +6,5 @@ char* cmbnewstr(char* str1, char* str2);
 
 //Get filesize
 int filesize(FILE* f);
+
+char* readfile(int filesize, FILE* f);
