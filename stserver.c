@@ -139,7 +139,7 @@ configuration* parseconf(char* confname)
 
     //Determine http version
     if(strcmp("HTTP1.0",token) == 0)
-        c->httpver = "1.0";
+        c->httpver = cpynewstr("1.0");
     else
     {
         exiterr("httpver error\n");

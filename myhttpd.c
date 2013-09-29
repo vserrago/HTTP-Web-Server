@@ -22,13 +22,15 @@ char* port = DEFAULTPORT;           //Port to listen in on
 char* address = "localhost";        //Address of server
 char* confname = DEFAULTCONFNAME;   //Name of config file
 
-stserver* serv;                     //Server var
-configuration* config;              //Config struct var
 
 int main(int argc, char *argv [])
 {
     int i, j;  //Loop Variables
     unsigned char portflag; //Command line param flags
+
+    //Server structs
+    stserver* serv;                     //Server var
+    configuration* config;              //Config struct var
 
     //Create server struct
     serv = allocstserv();
@@ -76,9 +78,9 @@ int main(int argc, char *argv [])
     }
 
     //Set server vars
-    serv->port = port;
-    serv->address = address;
-    serv->confname = confname;
+    serv->port     = cpynewstr(port);
+    serv->address  = cpynewstr(address);
+    serv->confname = cpynewstr(confname);
 
     servdeblog("Server Address: '%s', Port: '%s', Confname: '%s'\n", serv->address, 
             serv->port, serv->confname);
@@ -119,6 +121,10 @@ int main(int argc, char *argv [])
     }
 
     //Finish Up
-    close(serv->sock);
+    close(serv->sock); //Close socket
+
+    //Free server structs
+    freeconf(config);
+    freestserv(serv);
     exit(0);
 }
