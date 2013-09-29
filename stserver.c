@@ -283,10 +283,10 @@ char* recievereq(int sockfd)
 
 request* parsereq(char* reqstr)
 {
-    servdeblog("ABSOLUTELY NO parsing on string '%s'\n", reqstr);
-    //TODO Find out why reqstr doesn't work. May have to do with strtok
+    /* Save copy of request string so that it can be parsed properly, since
+     * strtok modifies the string as it tokenizes it.
+     */
     char* postreqstr = cpynewstr(reqstr);
-    servdeblog("ABSOLUTELY NO parsing on string '%s'\n", postreqstr);
 
     request* r = allocreq();
 
@@ -343,13 +343,10 @@ request* parsereq(char* reqstr)
 
     r->httpver = cpynewstr(token); 
 
-    servdeblog("PRE-POST parsing on string '%s'\n", postreqstr);
-
     char* contlenp;
     //HTTP POST-specific parsing
     if(strcmp(r->reqtype, "POST") == 0)
     {
-        servdeblog("POST parsing on string '%s'\n", postreqstr);
         //If content-length exists
         if((contlenp = strstr(postreqstr,"Content-Length")) != NULL)
         {
