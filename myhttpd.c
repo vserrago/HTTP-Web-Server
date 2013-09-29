@@ -1,6 +1,7 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <limits.h>
+#include <getopt.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -22,22 +23,25 @@ char* port     = DEFAULTPORT;       //Port to listen in on
 char* address  = DEFAULTADDRESS;    //Address of server
 char* confname = DEFAULTCONFNAME;   //Name of config file
 
-
 int main(int argc, char *argv [])
 {
-    int i, j;  //Loop Variables
-    unsigned char portflag; //Command line param flags
-    int opt; //Option element to be returned by getopt
+    int i, j;               //Loop Variables
+    int opt;                //Option element to be returned by getopt
+    int longindex;          //Used by getopt_long
 
     //Server structs
     stserver* serv;                     //Server var
     configuration* config;              //Config struct var
 
-    //Create server struct
-    serv = allocstserv();
+    //Verbose options for getopt
+    struct option long_options[] = 
+    {
+        {"debug",   no_argument,        NULL, 'd'},
+        {"port",    required_argument,  NULL, 'p'}
+    };
 
     //Parse arguments
-    while((opt = getopt(argc,argv,"dp:")) != -1)
+    while((opt = getopt_long(argc,argv,"dp:", long_options, &longindex)) != -1)
     {
         switch(opt)
         {
@@ -59,6 +63,9 @@ int main(int argc, char *argv [])
                 exit(EXIT_FAILURE);
         }
     }
+
+    //Create server struct
+    serv = allocstserv();
 
     //Set server vars
     serv->port     = cpynewstr(port);
