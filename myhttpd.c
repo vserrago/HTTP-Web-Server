@@ -32,20 +32,33 @@ int main(int argc, char *argv [])
     //Getopt vars
     int opt;                            //Option element to be returned by getopt
     int longindex;                      //Used by getopt_long
+    int portnum;                        //Used to check numeric value of port
 
     //Verbose options for getopt
     struct option long_options[] = 
     {
         //Name      Arg requirement     Flag  Value
+        {"address", required_argument,  NULL, 'a'},
+        {"config",  required_argument,  NULL, 'c'},
         {"debug",   no_argument,        NULL, 'd'},
         {"port",    required_argument,  NULL, 'p'}
     };
 
     //Parse arguments
-    while((opt = getopt_long(argc,argv,"dp:", long_options, &longindex)) != -1)
+    while((opt = getopt_long(argc,argv,"a:c:dp:", long_options, &longindex)) != -1)
     {
         switch(opt)
         {
+            //Address option
+            case 'a':
+                address = optarg;
+                servdeblog("Address set with value '%s'\n", address);
+                break;
+            //Config file option
+            case 'c':
+                confname = optarg;
+                servdeblog("Configuration file set with value '%s'\n", confname);
+                break;
             //Debug option
             case 'd':
                 debugflag = 1;
@@ -54,11 +67,11 @@ int main(int argc, char *argv [])
             //Port option
             case 'p':
                 port = optarg;
-                int portnum = atoi(port);
+                portnum = atoi(port); //Convert port to numeric value
                 //Ensure that portnumber is in the range of useable ports
                 if(portnum < MINPORTNUM || MAXPORTNUM < portnum)
                     exiterr("Portnumber is invalid\n");
-                servdeblog("Port flag set with given port %s\n", optarg);
+                servdeblog("Port set with value '%s'\n", port);
                 break;
             //Unkown option
             case '?': 
