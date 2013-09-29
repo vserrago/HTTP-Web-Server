@@ -41,6 +41,17 @@ int filesize(FILE* f)
     return n; 
 }
 
+//New empty string
+char* newemptystr(size_t size)
+{
+    //Allocate space for string
+    char* s = malloc(size);
+
+    //Make string empty by setting its first byte as null-terminator
+    s[0] = '\0';
+    return s;
+}
+
 //Reads in a file, given its size in bytes
 char* readfile(int filesize, FILE* f)
 {

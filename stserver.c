@@ -233,8 +233,8 @@ char* recievereq(int sockfd)
     int  br = 0;        //Bytes recieved
     unsigned char postflag = 0; //If we are waiting for a post request
 
-    char* reqstr = malloc(mbs*sizeof(char)); //Allocate space for string
-    reqstr[0] = '\0';   //Make empty string 
+    //Alloc space for request string
+    char* reqstr = newemptystr(mbs*sizeof(char));
 
     for(br=0; 0 < (br = recv(sockfd,buff, mbs,0)); )
     {
@@ -367,8 +367,7 @@ request* parsereq(char* reqstr)
         if((crlfs = strstr(postreqstr, "\r\n\r\n"))!= NULL)
         {
             crlfs +=4; //go to beginning of chars to read in
-            r->content = malloc((r->contlen+1)*sizeof(char));
-            r->content[0] = '\0';
+            r->content = newemptystr((r->contlen+1)*sizeof(char));
             strncat(r->content,crlfs,r->contlen);
             servdeblog("Read-in content: '%s'\n",r->content);
         }
@@ -604,8 +603,7 @@ void sendresp(int sockfd, response* resp)
     servdeblog("Response is %d bytes long\n", resplen);
 
     //Make string
-    char* respstr = malloc(resplen*sizeof(char));
-    respstr[0] = '\0';   //Make string empty
+    char* respstr = newemptystr(resplen*sizeof(char));
 
     //Turn response into 1 long string
     if(resp->status != NULL)
