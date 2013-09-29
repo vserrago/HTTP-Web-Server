@@ -246,12 +246,14 @@ char* recievereq(int sockfd)
 
         char* contlen;
         char* crlfs;
-        if((crlfs = strstr(reqstr, "\r\n\r\n"))!= NULL && !postflag)
+        //Check if there are two CRLFs if the postflag is not true
+        if(!postflag && (crlfs = strstr(reqstr, "\r\n\r\n"))!= NULL)
         {
             //Check for content length header //16 chars until number
             if((contlen = strstr(reqstr, "Content-Length:"))!= NULL)
             {
                 postflag = 1;
+                crlfs += 4; //Move past the two CRLFs
                 servdeblog("Postflag\n");
             }
             else
@@ -260,7 +262,7 @@ char* recievereq(int sockfd)
                 break;
             }
         }
-        else if((crlfs = strstr(reqstr, "\r\n"))!= NULL && postflag)
+        else if(postflag && (crlfs = strstr(reqstr, "\r\n"))!= NULL)
         {
             servdeblog("POST End found\n");
             break;
