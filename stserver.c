@@ -90,6 +90,7 @@ void freeresp(response* r)
     free(r->date);
     free(r->contype);
     free(r->contlenstr);
+    free(r->content);
     //Free struct
     free(r);
 }
@@ -393,6 +394,8 @@ badrequest:
         servdeblog("Bad request detected\n");
     }
 
+    free(postreqstr); //Free string
+
     return r;
 }
 
@@ -403,7 +406,7 @@ response* handlereq(request* req, configuration* config)
     unsigned char notfndflag  = 0; //Not found flag
     unsigned char headreqflag = 0; //Error must return head if requesting head
 
-    char* filepath; //Full path for requested file
+    char* filepath = NULL; //Full path for requested file
     FILE* f;
 
     //TODO: Return index.htm if file given is "/"
@@ -563,6 +566,10 @@ errors: //Handle errors
             resp->content = readfile(resp->contlen, f);
         fclose(f);
     }
+
+    //Cleanup
+    if(filepath != NULL)
+        free(filepath);
 
     return resp;
 }
