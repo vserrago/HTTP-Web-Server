@@ -27,6 +27,7 @@ int main(int argc, char *argv [])
 {
     int i, j;  //Loop Variables
     unsigned char portflag; //Command line param flags
+    int opt; //Option element to be returned by getopt
 
     //Server structs
     stserver* serv;                     //Server var
@@ -35,45 +36,27 @@ int main(int argc, char *argv [])
     //Create server struct
     serv = allocstserv();
 
-    /* Arg Parsing */
-    for(i=1; i<argc; i++)
+    //Parse arguments
+    while((opt = getopt(argc,argv,"dp:")) != -1)
     {
-        servdeblog("Param: %s\n", argv[i]);
-        if(argv[i][0] == '-')
+        switch(opt)
         {
-            int len = strlen(argv[i]);
-            for(j=1; j<len; j++)
-            {
-                switch(argv[i][j])
-                {
-                    case 'p': 
-                        servdeblog("p param given\n");
-                        portflag = 1;
-                        break;
-                    case 'd':
-                        servdeblog("d param given\n");
-                        debugflag = 1;
-                        break;
-                    default:
-                        exiterr("Unkown param given\n");
-                        break;
-                }
-            }
-        }
-        else if(portflag)
-        {
-            port = argv[i];
-            int portnum = atoi(port);
-            //Ensure that portnumber is in the range of useable ports
-            if(portnum < MINPORTNUM || USHRT_MAX < portnum)
-            {
-                exiterr("Portnumber is invalid\n");
-            }
-            servdeblog("Portnum is %s\n", port);
-        }
-        else
-        {
-            exiterr("Unkown arg given\n");
+            case 'd':
+                debugflag = 1;
+                servdeblog("Debug mode enabled\n");
+                break;
+            case 'p':
+                port = optarg;
+                int portnum = atoi(port);
+                //Ensure that portnumber is in the range of useable ports
+                if(portnum < MINPORTNUM || MAXPORTNUM < portnum)
+                    exiterr("Portnumber is invalid\n");
+                servdeblog("Port flag set with given port %s\n", optarg);
+                break;
+            case '?': //Character for unknown arg
+            default:
+                //Use exit function as error message is already printed by getopt
+                exit(EXIT_FAILURE);
         }
     }
 

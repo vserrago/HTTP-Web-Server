@@ -2,6 +2,7 @@
 
 //Constants
 #define MINPORTNUM 60000
+#define MAXPORTNUM 65535
 #define DEFAULTPORTNUM 61000
 #define DEFAULTADDRESS "localhost"
 #define DEFAULTPORT "61000"
