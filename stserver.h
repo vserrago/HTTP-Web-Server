@@ -7,6 +7,7 @@
 #define DEFAULTADDRESS "localhost"
 #define DEFAULTPORT "61000"
 #define DEFAULTCONFNAME "myhttpd.conf"
+#define DEFAULTFILENAME "index.htm"
 
 #define ST200 "HTTP/1.0 200 OK\r\n"
 #define ST201 "HTTP/1.0 201 File created successfully\r\n"

@@ -323,7 +323,13 @@ request* parsereq(char* reqstr)
         goto badrequest;
     }
 
-    r->reqfile = cpynewstr(token); 
+    int namelen = strlen(token);
+
+    //If the token ends in a /, concatenate the default page onto it
+    if(token[namelen-1] == '/')
+        r->reqfile = cmbnewstr(token, DEFAULTFILENAME);
+    else
+        r->reqfile = cpynewstr(token);
 
 
     //Parse HTTPver
@@ -406,16 +412,15 @@ response* handlereq(request* req, configuration* config)
     char* filepath = NULL; //Full path for requested file
     FILE* f;
 
-    //TODO: Return index.htm if file given is "/"
-
     response* resp = allocresp();
     //If invalid request
     if(req->badreq)
     {
         goto errors;
     }
+
     //If get or head request
-    else if(strcmp(req->reqtype, "GET") == 0 || strcmp(req->reqtype, "HEAD") == 0)
+    if(strcmp(req->reqtype, "GET") == 0 || strcmp(req->reqtype, "HEAD") == 0)
     {
         //Set head flag in case of an error
         if(strcmp(req->reqtype, "HEAD") == 0)
