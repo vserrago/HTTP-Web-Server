@@ -10,6 +10,7 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <time.h>
 #include <unistd.h>
 
 //Local includes
@@ -491,7 +492,6 @@ response* handlereq(request* req, configuration* config)
         resp->status = cpynewstr(ST201);
         resp->date = getdate();
 
-
         if((f = fopen(HTML201,"r")) == NULL)
             exiterr("Error file error\n");
         //Get content length
@@ -573,8 +573,10 @@ errors: //Handle errors
 //Gets the current date
 char* getdate(void)
 {
-    //TODO get actual date
-    return cpynewstr("Date: Fri, 31 Dec 1999 23:59:59 GMT\r\n");
+    time_t t; //Time variable
+    time(&t); //Get system time
+    //Return system time as a string
+    return cmbnewstr("Date: ", ctime(&t));
 }
 
 void sendresp(int sockfd, response* resp)
