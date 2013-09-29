@@ -18,8 +18,8 @@
 
 
 //Server Config Vars
-char* port = DEFAULTPORT;           //Port to listen in on 
-char* address = "localhost";        //Address of server
+char* port     = DEFAULTPORT;       //Port to listen in on 
+char* address  = DEFAULTADDRESS;    //Address of server
 char* confname = DEFAULTCONFNAME;   //Name of config file
 
 

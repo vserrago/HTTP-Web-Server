@@ -3,6 +3,7 @@
 //Constants
 #define MINPORTNUM 60000
 #define DEFAULTPORTNUM 61000
+#define DEFAULTADDRESS "localhost"
 #define DEFAULTPORT "61000"
 #define DEFAULTCONFNAME "myhttpd.conf"
 
@@ -15,11 +16,11 @@
 
 #define CONTYPETEXT "Content-Type: text/html\r\n"
 
-#define HTML201 "errpages/err201.htm"
-#define HTML400 "errpages/err400.htm"
-#define HTML403 "errpages/err403.htm"
-#define HTML404 "errpages/err404.htm"
-#define HTML501 "errpages/err501.htm"
+#define HTML201 "statuspages/st201.htm"
+#define HTML400 "statuspages/st400.htm"
+#define HTML403 "statuspages/st403.htm"
+#define HTML404 "statuspages/st404.htm"
+#define HTML501 "statuspages/st501.htm"
 
 //Global Vars
 unsigned char debugflag;    //Whether debug logging is enabled or not
