@@ -143,7 +143,7 @@ configuration* parseconf(char* confname)
     if(strcmp("HTTP1.0",token) == 0)
         c->httpver = cpynewstr("HTTP/1.0");
     else if(strcmp("HTTP1.1",token) == 0)
-        //We only serve as an HTTP1.0 server
+        //Though we can serve 1.1 requests, we only serve as an HTTP1.0 server
         exiterr("Server can not be HTTP1.1\n"); 
     else
         exiterr("Http version configuration error \n");
@@ -156,9 +156,10 @@ configuration* parseconf(char* confname)
 
     servdeblog("Dirlen Token size: %d\n", dirlen);
 
-    //Copy the dir name to a new char array of size n -2(brackets) -1(newline) 
-    //+ 1 (null terminator). Copy dirlen -1(end bracket) -1(newline).
-    //c->rootdir = strcpy(malloc((dirlen)*sizeof(char)),&token[1]);
+    /* Copy the dir name to a new char array of size n -2(brackets) + 1 (null-
+     * terminator). Copy dirlen -1(begin bracket) -1(end bracket). Copy from
+     * the first element +1, to avoid the begin bracket.
+     */
     c->rootdir = strncpy(malloc((dirlen-2+1)*sizeof(char)),&token[1], dirlen-2);
     servdeblog("Home Directory: %s\n", c->rootdir);
 
@@ -169,7 +170,7 @@ configuration* parseconf(char* confname)
     //c->extentions = malloc(); TODO finish this
 
 
-    //Get pool amount
+    //Read pool line
     fgets(s,readsize,f);
     servdeblog("File Line: %s", s);
 
@@ -183,11 +184,11 @@ configuration* parseconf(char* confname)
 
     //Pool number
     token = strtok(NULL," \r\n"); 
-    servdeblog("Token: '%s'\n",token);
     c->poolsize = strtol(token, NULL, 10);
+    servdeblog("Token: '%s', Pool integer value: '%d'\n", token, c->poolsize);
 
 
-    //Get queue amount
+    //Read queue line
     fgets(s,readsize,f);
     servdeblog("File Line: %s", s);
 
@@ -201,14 +202,12 @@ configuration* parseconf(char* confname)
 
     //Queue number
     token = strtok(NULL," \r\n"); 
-    servdeblog("Token: '%s'\n",token);
     c->queuesize = strtol(token, NULL, 10);
+    servdeblog("Token: '%s', Queue integer value: '%d'\n", token, c->queuesize);
 
 
     if(fclose(f) !=0) //Close file and make sure it closes properly
-    {
         exitperr("fclose");
-    }
 
     return c;
 }
