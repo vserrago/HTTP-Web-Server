@@ -15,3 +15,5 @@ queue* createqueue(int size);
 void freequeue(queue* q);
 void queueadd(queue* q, int value);
 int queuerem(queue* q);
+int queuepeek(queue* q);
+int qhaselem(queue* q);

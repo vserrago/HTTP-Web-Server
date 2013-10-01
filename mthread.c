@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -56,4 +57,20 @@ int queuerem(queue* q)
     q->nextout++;
     q->nextout %= q->size;
     return val;
+}
+
+/* Retrieves, but does not remove the next element out. If the queue is empty,
+ * then the function returns DEFAULTQVAL
+ */
+int queuepeek(queue* q)
+{
+    return q->array[q->nextout];
+}
+
+/* Returns true queuepeek returns a non-default value
+ */
+int qhaselem(queue* q)
+{
+    //If queuepeek is default return false, else true
+    return (queuepeek(q) == DEFAULTQVAL) ? false : true;
 }

@@ -57,10 +57,6 @@ int main(int argc, char *argv [])
     char* address  = DEFAULTADDRESS;    //Address of server
     char* confname = DEFAULTCONFNAME;   //Name of config file
 
-    //Multithreading config vars        TODO parse these values from config
-    int poolsize  = 5;                  //Size of thread pool
-    int queuesize = 5;                  //Size of queue
-
     //Server structs
     stserver* serv;                     //Server var
 
@@ -136,17 +132,25 @@ int main(int argc, char *argv [])
     //TODO create queue, threadpool, etc
     //queue* q = createqueue(c->queuesize);
 
-    queue* q = createqueue(3);
+    queue* q = createqueue(5);
 
     queueadd(q,1);
     queueadd(q,2);
     queueadd(q,3);
     queueadd(q,4);
 
+
+    servlog("Queue Peek: %d\n", queuepeek(q));
+    servlog("Queue has elements: %d\n", qhaselem(q));
+
     servlog("Queue val: %d\n", queuerem(q));
     servlog("Queue val: %d\n", queuerem(q));
     servlog("Queue val: %d\n", queuerem(q));
     servlog("Queue val: %d\n", queuerem(q));
+
+    servlog("Queue Peek: %d\n", queuepeek(q));
+    servlog("Queue has elements: %d\n", qhaselem(q));
+
 
 
     exit (0); //TODO remove this
