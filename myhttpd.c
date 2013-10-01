@@ -132,6 +132,8 @@ int main(int argc, char *argv [])
     //Create, bind and listen on port
     prepserv(serv); 
 
+    //TODO create queue, threadpool, etc
+
     //Connection info structs
     struct sockaddr_storage socket_st;
     socklen_t addr_size = sizeof socket_st;
