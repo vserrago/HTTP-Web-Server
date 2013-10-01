@@ -4,6 +4,8 @@
 #include <getopt.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <pthread.h>
+#include <semaphore.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,6 +19,35 @@
 #include "stserver.h"
 #include "util.h"
 
+//TODO make this non-global
+configuration* config;              //Config struct var
+
+void* handlecon(void* connectfdp)
+{
+    int* intp = (int*) connectfdp;
+    int connectfd = *intp;
+    //Get server request in string format
+    char* reqstr = recievereq(connectfd); 
+
+    //Parse server request from string
+    request* req = parsereq(reqstr);
+
+    //Generate a response based on the request and its validity
+    response* resp = handlereq(req, config);
+
+    //Send the response back to the client
+    sendresp(connectfd,resp);
+
+    //Free connection info
+    free(reqstr);
+    freereq(req);
+    freeresp(resp);
+
+    //Close connection
+    close(connectfd);
+
+    pthread_exit(0);
+}
 
 int main(int argc, char *argv [])
 {
@@ -25,9 +56,12 @@ int main(int argc, char *argv [])
     char* address  = DEFAULTADDRESS;    //Address of server
     char* confname = DEFAULTCONFNAME;   //Name of config file
 
+    //Multithreading config vars        TODO parse these values from config
+    int poolsize  = 5;                  //Size of thread pool
+    int queuesize = 5;                  //Size of queue
+
     //Server structs
     stserver* serv;                     //Server var
-    configuration* config;              //Config struct var
 
     //Getopt vars
     int opt;                            //Option element to be returned by getopt
@@ -112,27 +146,11 @@ int main(int argc, char *argv [])
         if(c < 0)
             exiterr("Accept error\n");
 
-        //Get server request in string format
-        char* reqstr = recievereq(c); 
+        pthread_t pthr;
 
-        //Parse server request from string
-        request* req = parsereq(reqstr);
+        pthread_create(&pthr,NULL, handlecon, &c);
 
-        //Generate a response based on the request and its validity
-        response* resp = handlereq(req, config);
-
-        //Send the response back to the client
-        sendresp(c,resp);
-
-        //Free connection info
-        free(reqstr);
-        freereq(req);
-        freeresp(resp);
-
-        //Close connection
-        close(c);
-
-        break; //Break for testings sake
+        //break; //Break for testings sake
     }
 
     //Finish Up

@@ -4,11 +4,11 @@ OBJS    := ${SRCS:.c=.o}
 DEPS    := ${SRCS:.c=.dep} 
 XDEPS   := $(wildcard ${DEPS}) 
 
-#CC      = gcc
-CC      = clang
+CC      = gcc
+#CC      = clang
 CCFLAGS = 
-LDFLAGS = 
-LIBS    = 
+LDFLAGS = -lpthread 
+LIBS    =
 
 .PHONY: all clean distclean 
 	all:: ${TARGET} 
