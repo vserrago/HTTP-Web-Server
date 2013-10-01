@@ -121,19 +121,19 @@ void freeconf(configuration* c)
 
 configuration* parseconf(char* confname)
 {
+    //TODO do more error checking
     configuration* c = allocconf();
 
     FILE* f = fopen(confname, "r"); //Open file for reading
 
     if(f == NULL)
-    {
         exitperr("fopen");
-    }
 
-    char s [100];
+    int readsize = 100;
+    char s [readsize];
     char* token;
 
-    fgets(s,100,f);
+    fgets(s,readsize,f);
     servdeblog("DirPath Line: %s", s);
 
     token = strtok(s," "); //Note, strtok is not threadsafe implementation
@@ -141,11 +141,12 @@ configuration* parseconf(char* confname)
 
     //Determine http version
     if(strcmp("HTTP1.0",token) == 0)
-        c->httpver = cpynewstr("1.0");
+        c->httpver = cpynewstr("HTTP/1.0");
+    else if(strcmp("HTTP1.1",token) == 0)
+        //We only serve as an HTTP1.0 server
+        exiterr("Server can not be HTTP1.1\n"); 
     else
-    {
-        exiterr("httpver error\n");
-    }
+        exiterr("Http version configuration error \n");
 
     //Set home directory
     token = strtok(NULL," \r\n"); 
@@ -162,12 +163,47 @@ configuration* parseconf(char* confname)
     servdeblog("Home Directory: %s\n", c->rootdir);
 
     //Get filetypes
-    fgets(s,100,f);
+    fgets(s,readsize,f);
     servdeblog("File Line: %s", s);
 
     //c->extentions = malloc(); TODO finish this
 
-    int len = strlen(s);
+
+    //Get pool amount
+    fgets(s,readsize,f);
+    servdeblog("File Line: %s", s);
+
+    //POOL identifier
+    token = strtok(s," \r\n"); 
+    servdeblog("Token: '%s'\n",token);
+
+    //Ensure that identifier is correct
+    if(strcmp("POOL",token) != 0)
+        exiterr("%s is missing POOL identifier", confname);
+
+    //Pool number
+    token = strtok(NULL," \r\n"); 
+    servdeblog("Token: '%s'\n",token);
+    c->poolsize = strtol(token, NULL, 10);
+
+
+    //Get queue amount
+    fgets(s,readsize,f);
+    servdeblog("File Line: %s", s);
+
+    //QUEUE identifier
+    token = strtok(s," \r\n"); 
+    servdeblog("Token: '%s'\n",token);
+
+    //Ensure that identifier is correct
+    if(strcmp("QUEUE",token) != 0)
+        exiterr("%s is missing QUEUE identifier", confname);
+
+    //Queue number
+    token = strtok(NULL," \r\n"); 
+    servdeblog("Token: '%s'\n",token);
+    c->queuesize = strtol(token, NULL, 10);
+
 
     if(fclose(f) !=0) //Close file and make sure it closes properly
     {

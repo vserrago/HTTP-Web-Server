@@ -6,7 +6,7 @@
 #define DEFAULTPORTNUM 61000
 #define DEFAULTADDRESS "localhost"
 #define DEFAULTPORT "61000"
-#define DEFAULTCONFNAME "myhttpd.conf"
+#define DEFAULTCONFNAME "multithread.conf"
 #define DEFAULTFILENAME "index.htm"
 
 #define ST200 "HTTP/1.0 200 OK\r\n"
@@ -38,15 +38,17 @@ typedef struct //stserver
 
 typedef struct //configuration
 {
-    char* httpver;
-    char* rootdir;
-    char** extentions;
-    int nextentions;
+    char* httpver;              //Server's HTTP version
+    char* rootdir;              //Location of directory to serve from
+    char** extentions;          //Supported file extensions
+    int nextentions;            //Number of extensions
+    int poolsize;               //Size of thread pool
+    int queuesize;              //Size of task queue
 } configuration;
 
 typedef struct //request
 {
-    unsigned char badreq; //Flag for if request is not valid
+    unsigned char badreq;      //Flag for if request is not valid
     char* reqtype;  //Requested type, Ex GET
     char* reqfile;  //Requested file
     char* httpver;  //HTTP version
