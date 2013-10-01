@@ -18,6 +18,7 @@
 //Local includes
 #include "stserver.h"
 #include "util.h"
+#include "mthread.h"
 
 //TODO make this non-global
 configuration* config;              //Config struct var
@@ -133,6 +134,22 @@ int main(int argc, char *argv [])
     prepserv(serv); 
 
     //TODO create queue, threadpool, etc
+    //queue* q = createqueue(c->queuesize);
+
+    queue* q = createqueue(3);
+
+    queueadd(q,1);
+    queueadd(q,2);
+    queueadd(q,3);
+    queueadd(q,4);
+
+    servlog("Queue val: %d\n", queuerem(q));
+    servlog("Queue val: %d\n", queuerem(q));
+    servlog("Queue val: %d\n", queuerem(q));
+    servlog("Queue val: %d\n", queuerem(q));
+
+
+    exit (0); //TODO remove this
 
     //Connection info structs
     struct sockaddr_storage socket_st;
