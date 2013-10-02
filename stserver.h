@@ -25,7 +25,7 @@
 #define HTML501 "statuspages/st501.htm"
 
 //Global Vars
-unsigned char debugflag;    //Whether debug logging is enabled or not
+unsigned char debugflag;        //Whether debug logging is enabled or not
 
 //Struct definitions
 typedef struct //stserver
@@ -48,22 +48,22 @@ typedef struct //configuration
 
 typedef struct //request
 {
-    unsigned char badreq;      //Flag for if request is not valid
-    char* reqtype;  //Requested type, Ex GET
-    char* reqfile;  //Requested file
-    char* httpver;  //HTTP version
-    char* content;  //Content from post
-    int   contlen;  //Length of content
+    unsigned char badreq;       //Flag for if request is not valid
+    char* reqtype;              //Requested type, Ex GET
+    char* reqfile;              //Requested file
+    char* httpver;              //HTTP version
+    char* content;              //Content from post
+    int   contlen;              //Length of content
 }request;
 
 typedef struct response
 {
-    char* status;       //Status line, ex HTTP/1.0 200 OK
-    char* date;         //Date
-    char* contype;      //Content-Type
-    char* contlenstr;   //Content-length string
-    char* content;      //Content to return as a string
-    int   contlen;      //Content-length
+    char* status;               //Status line, ex HTTP/1.0 200 OK
+    char* date;                 //Date
+    char* contype;              //Content-Type
+    char* contlenstr;           //Content-length string
+    char* content;              //Content to return as a string
+    int   contlen;              //Content-length
 }response;
 
 

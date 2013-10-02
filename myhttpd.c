@@ -35,7 +35,6 @@ sem_t semtasks;               //Keeps count on number of unhandled tasks
 //Thread function
 void* handlecon(void* args)
 {
-    //threadargs* a = args;
     int connectfd;  //Connection file descriptor
 
     for(;;)
@@ -213,7 +212,6 @@ int main(int argc, char *argv [])
 
             servdeblog("Connection '%d' added to queue\n",c);
             servdeblog("Nextout: %d\n",qpeek(q));
-            //servdeblog("Removed value: %d\n",qrem(q));
 
             //Increment task count
             sem_post(&semtasks);
@@ -223,6 +221,8 @@ int main(int argc, char *argv [])
 
         //break; //Break for testings sake
     }
+
+    //TODO: Clean up semaphores
 
     //Finish Up
     close(serv->sock); //Close socket
