@@ -20,33 +20,69 @@
 #include "queue.h"
 #include "util.h"
 
-//TODO make this non-global
-configuration* config;              //Config struct var
+//TODO pass thread dependencies in argument
 
-void* handlecon(void* connectfdp)
+//Global config vars
+configuration* config;      //Config struct var
+queue* q;                   //Connection queue
+
+//Semaphores
+sem_t semconfig;              //Limits access to config var
+sem_t semq;                   //Limits access to connection queue
+sem_t semtasks;               //Keeps count on number of unhandled tasks
+
+
+//Thread function
+void* handlecon(void* args)
 {
-    int* intp = (int*) connectfdp;
-    int connectfd = *intp;
-    //Get server request in string format
-    char* reqstr = recievereq(connectfd); 
+    //threadargs* a = args;
+    int connectfd;  //Connection file descriptor
 
-    //Parse server request from string
-    request* req = parsereq(reqstr);
+    for(;;)
+    {
+        //Wait for a task to come in
+        sem_wait(&semtasks);
 
-    //Generate a response based on the request and its validity
-    response* resp = handlereq(req, config);
+        servdeblog("Task handled by thread\n");
 
-    //Send the response back to the client
-    sendresp(connectfd,resp);
+        //Lock queue
+        sem_wait(&semq);
+        {
+            servdeblog("Peek value: %d\n",qpeek(q));
+            //Get connection file descriptor
+            connectfd = qrem(q);
+        }
+        //Unlock queue
+        sem_post(&semq);
 
-    //Free connection info
-    free(reqstr);
-    freereq(req);
-    freeresp(resp);
+        //Get server request in string format
+        char* reqstr = recievereq(connectfd);
 
-    //Close connection
-    close(connectfd);
+        //Parse server request from string
+        request* req = parsereq(reqstr);
 
+        response* resp;
+
+        //Lock config
+        sem_wait(&semconfig);
+        {
+            //Generate a response based on the request and its validity
+            resp = handlereq(req, config);
+        }
+        //Unlock config
+        sem_post(&semconfig);
+
+        //Send the response back to the client
+        sendresp(connectfd,resp);
+
+        //Free connection info
+        free(reqstr);
+        freereq(req);
+        freeresp(resp);
+
+        //Close connection
+        close(connectfd);
+    }
     pthread_exit(0);
 }
 
@@ -59,6 +95,9 @@ int main(int argc, char *argv [])
 
     //Server structs
     stserver* serv;                     //Server var
+
+    //Thread vars
+    pthread_t* pthrarr;                 //pthread array
 
     //Getopt vars
     int opt;                            //Option element to be returned by getopt
@@ -126,34 +165,31 @@ int main(int argc, char *argv [])
     //Parse configuration file and get info from it.
     config = parseconf(confname);
 
+    //Create queue
+    q = createqueue(config->queuesize);
+
     //Create, bind and listen on port
     prepserv(serv); 
 
-    //TODO create queue, threadpool, etc
-    //queue* q = createqueue(c->queuesize);
+    //Create semaphores
+    sem_init(&semconfig, 0, 1); //Binary semaphore
+    sem_init(&semq, 0, 1);      //Also binary
+    sem_init(&semtasks, 0, 0);  //Represents the amount of tasks in queue
 
-    queue* q = createqueue(5);
+    //Create threadpool
+    pthrarr = malloc(config->poolsize * sizeof(pthread_t));
 
-    qadd(q,1);
-    qadd(q,2);
-    qadd(q,3);
-    qadd(q,4);
+    int i;
+    pthread_t pthr;
+    for(i=0; i < config->poolsize; i++)
+    {
+        //Create thread and add it to pool
+        pthread_create(&pthr,NULL, handlecon, 0);
+        pthrarr[i] = pthr;
 
-
-    servlog("Queue Peek: %d\n", qpeek(q));
-    servlog("Queue has elements: %d\n", qhaselem(q));
-
-    servlog("Queue val: %d\n", qrem(q));
-    servlog("Queue val: %d\n", qrem(q));
-    servlog("Queue val: %d\n", qrem(q));
-    servlog("Queue val: %d\n", qrem(q));
-
-    servlog("Queue Peek: %d\n", qpeek(q));
-    servlog("Queue has elements: %d\n", qhaselem(q));
-
-
-
-    exit (0); //TODO remove this
+        servdeblog("Thread %d created\n", i);
+        //TODO free args
+    }
 
     //Connection info structs
     struct sockaddr_storage socket_st;
@@ -169,9 +205,21 @@ int main(int argc, char *argv [])
         if(c < 0)
             exiterr("Accept error\n");
 
-        pthread_t pthr;
+        //Lock queue
+        sem_wait(&semq);
+        {
+            //Add connection to queue
+            qadd(q,c);
 
-        pthread_create(&pthr,NULL, handlecon, &c);
+            servdeblog("Connection '%d' added to queue\n",c);
+            servdeblog("Nextout: %d\n",qpeek(q));
+            //servdeblog("Removed value: %d\n",qrem(q));
+
+            //Increment task count
+            sem_post(&semtasks);
+        }
+        //Unlock queue
+        sem_post(&semq);
 
         //break; //Break for testings sake
     }
