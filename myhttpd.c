@@ -17,8 +17,8 @@
 
 //Local includes
 #include "stserver.h"
+#include "queue.h"
 #include "util.h"
-#include "mthread.h"
 
 //TODO make this non-global
 configuration* config;              //Config struct var
@@ -134,21 +134,21 @@ int main(int argc, char *argv [])
 
     queue* q = createqueue(5);
 
-    queueadd(q,1);
-    queueadd(q,2);
-    queueadd(q,3);
-    queueadd(q,4);
+    qadd(q,1);
+    qadd(q,2);
+    qadd(q,3);
+    qadd(q,4);
 
 
-    servlog("Queue Peek: %d\n", queuepeek(q));
+    servlog("Queue Peek: %d\n", qpeek(q));
     servlog("Queue has elements: %d\n", qhaselem(q));
 
-    servlog("Queue val: %d\n", queuerem(q));
-    servlog("Queue val: %d\n", queuerem(q));
-    servlog("Queue val: %d\n", queuerem(q));
-    servlog("Queue val: %d\n", queuerem(q));
+    servlog("Queue val: %d\n", qrem(q));
+    servlog("Queue val: %d\n", qrem(q));
+    servlog("Queue val: %d\n", qrem(q));
+    servlog("Queue val: %d\n", qrem(q));
 
-    servlog("Queue Peek: %d\n", queuepeek(q));
+    servlog("Queue Peek: %d\n", qpeek(q));
     servlog("Queue has elements: %d\n", qhaselem(q));
 
 

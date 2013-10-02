@@ -1,5 +1,5 @@
 TARGET  := server
-SRCS    := myhttpd.c stserver.c util.c globsem.c mthread.c
+SRCS    := myhttpd.c stserver.c util.c globsem.c queue.c
 OBJS    := ${SRCS:.c=.o} 
 DEPS    := ${SRCS:.c=.dep} 
 XDEPS   := $(wildcard ${DEPS}) 

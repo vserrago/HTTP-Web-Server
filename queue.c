@@ -3,7 +3,7 @@
 #include <string.h>
 
 //Local includes
-#include "mthread.h"
+#include "queue.h"
 #include "stserver.h"
 
 queue* createqueue(int size)
@@ -27,7 +27,7 @@ void freequeue(queue* q)
     free(q);
 }
 
-void queueadd(queue* q, int value)
+void qadd(queue* q, int value)
 {
     //Check to see that queue is not full
     if(q->array[q->nextin] != DEFAULTQVAL)
@@ -41,7 +41,7 @@ void queueadd(queue* q, int value)
     q->nextin %= q->size;
 }
 
-int queuerem(queue* q)
+int qrem(queue* q)
 {
     int val;
 
@@ -62,15 +62,15 @@ int queuerem(queue* q)
 /* Retrieves, but does not remove the next element out. If the queue is empty,
  * then the function returns DEFAULTQVAL
  */
-int queuepeek(queue* q)
+int qpeek(queue* q)
 {
     return q->array[q->nextout];
 }
 
-/* Returns true queuepeek returns a non-default value
+/* Returns true qpeek returns a non-default value
  */
 int qhaselem(queue* q)
 {
-    //If queuepeek is default return false, else true
-    return (queuepeek(q) == DEFAULTQVAL) ? false : true;
+    //If qpeek is default return false, else true
+    return (qpeek(q) == DEFAULTQVAL) ? false : true;
 }
