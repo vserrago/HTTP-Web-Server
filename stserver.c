@@ -263,7 +263,6 @@ void prepserv(stserver* serv)
 
 char* recievereq(int sockfd)
 {
-
     int  mbs = 1024;    //Maximum buffer size, size of 2KiB
     char buff [mbs];    //Buffer to recieve from
     int  br = 0;        //Bytes recieved
@@ -304,14 +303,13 @@ char* recievereq(int sockfd)
         }
     }
 
+    //If loop ends/breaks with a br of less than 1, then an error occured
     if(br < 0)
-    {
         exiterr("Recieve Error\n");
-    }
-
     if(br == 0)
     {
-        exiterr("Connection Closed\n");
+        //TODO, return NULL, have thread handle error
+        exiterr("Error: Client closed connection\n");
     }
 
     servdeblog("%d bytes recieved, Request:\n", strlen(reqstr));
