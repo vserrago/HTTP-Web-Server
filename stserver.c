@@ -261,6 +261,10 @@ void prepserv(stserver* serv)
     freeaddrinfo(servinfo); //Free address info
 }
 
+/* Recieves from a connection specified by sockfd and then returns a string
+ * containing the entire request. Returns NULL if connection was closed by the
+ * client while recieving from it.
+ */
 char* recievereq(int sockfd)
 {
     int  mbs = 1024;    //Maximum buffer size, size of 2KiB
@@ -308,8 +312,8 @@ char* recievereq(int sockfd)
         exiterr("Recieve Error\n");
     if(br == 0)
     {
-        //TODO, return NULL, have thread handle error
-        exiterr("Error: Client closed connection\n");
+        free(reqstr); //Free unused request
+        return NULL;
     }
 
     servdeblog("%d bytes recieved, Request:\n", strlen(reqstr));

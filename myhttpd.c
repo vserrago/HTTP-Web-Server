@@ -20,7 +20,6 @@
 #include "queue.h"
 #include "util.h"
 
-//TODO pass thread dependencies in argument
 
 //Global config vars
 configuration* config;      //Config struct var
@@ -42,7 +41,7 @@ void* handlecon(void* args)
         //Wait for a task to come in
         sem_wait(&semtasks);
 
-        servdeblog("Task handled by thread\n");
+        servlog("Task handled by thread\n");
 
         //Lock queue
         sem_wait(&semq);
@@ -54,8 +53,16 @@ void* handlecon(void* args)
         //Unlock queue
         sem_post(&semq);
 
-        //Get server request in string format
-        char* reqstr = recievereq(connectfd);
+        //Request string
+        char* reqstr;
+
+        //Get server request in string format, and check if null
+        if((reqstr = recievereq(connectfd)) == NULL)
+        {
+            servlog("Connection with client lost: client closed connection\n");
+            close(connectfd);   //Close connection
+            continue;           //Skip to next loop iteration
+        }
 
         //Parse server request from string
         request* req = parsereq(reqstr);
@@ -187,7 +194,6 @@ int main(int argc, char *argv [])
         pthrarr[i] = pthr;
 
         servdeblog("Thread %d created\n", i);
-        //TODO free args
     }
 
     //Connection info structs
