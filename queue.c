@@ -1,4 +1,3 @@
-#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -72,5 +71,5 @@ int qpeek(queue* q)
 int qhaselem(queue* q)
 {
     //If qpeek is default return false, else true
-    return (qpeek(q) == DEFAULTQVAL) ? false : true;
+    return (qpeek(q) == DEFAULTQVAL) ? 0 : 1;
 }
