@@ -167,8 +167,7 @@ configuration* parseconf(char* confname)
     fgets(s,readsize,f);
     servdeblog("File Line: %s", s);
 
-    //c->extentions = malloc(); TODO finish this
-
+    c->extentions = cpynewstr(s);
 
     //Read pool line
     fgets(s,readsize,f);
